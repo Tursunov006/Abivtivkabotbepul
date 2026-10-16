@@ -2,10 +2,13 @@ import os
 import sys
 import asyncio
 import logging
+import urllib.request
 from pathlib import Path
 from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher, F, types
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -13,7 +16,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import (
     ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove,
     InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile,
-    WebAppInfo
+    WebAppInfo, MenuButtonWebApp
 )
 
 from texts import T, LANGS, EDU, REL_KINDS, CHOOSE_LANG, LANG_BUTTONS
@@ -60,22 +63,30 @@ dp = Dispatcher(storage=MemoryStorage())
 def get_main_menu_kb(lang: str = "lat"):
     buttons = []
     
-    # 1. Mini Web App tugmasi
+    # 1. Mini Web App tugmasi (Asosiy tavsiya)
     if WEBAPP_URL:
         btn_webapp_text = {
-            "lat": "📱 Mini Ilovada to'ldirish (Tez va qulay)",
-            "cyr": "📱 Мини Иловада тўлдириш (Тез ва қулай)",
-            "ru": "📱 Заполнить в Мини-Приложении"
-        }.get(lang, "📱 Mini Ilovada to'ldirish")
+            "lat": "🚀 Mini Ilovada 1 daqiqada tayyorlash",
+            "cyr": "🚀 Мини Иловада 1 дақиқада тайёрлаш",
+            "ru": "🚀 Создать за 1 минуту в Мини-Приложении"
+        }.get(lang, "🚀 Mini Ilovada tayyorlash")
         buttons.append([InlineKeyboardButton(text=btn_webapp_text, web_app=WebAppInfo(url=WEBAPP_URL))])
 
     # 2. Bot ichida qadamma-qadam to'ldirish
     btn_chat_text = {
-        "lat": "💬 Bot ichida savol-javob orqali",
-        "cyr": "💬 Бот ичида савол-жавоб орқали",
-        "ru": "💬 Внутри бота пошагово"
-    }.get(lang, "💬 Bot ichida savol-javob orqali")
+        "lat": "💬 Savol-javob orqali to'ldirish",
+        "cyr": "💬 Савол-жавоб орқали тўлдириш",
+        "ru": "💬 Заполнить пошагово в чате"
+    }.get(lang, "💬 Savol-javob orqali to'ldirish")
     buttons.append([InlineKeyboardButton(text=btn_chat_text, callback_data="start_chat_flow")])
+
+    # 3. Tilni o'zgartirish
+    btn_lang_text = {
+        "lat": "🌐 Tilni o'zgartirish",
+        "cyr": "🌐 Тилни ўзгартириш",
+        "ru": "🌐 Изменить язык"
+    }.get(lang, "🌐 Tilni o'zgartirish")
+    buttons.append([InlineKeyboardButton(text=btn_lang_text, callback_data="change_lang")])
     
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -122,12 +133,66 @@ def get_format_kb(lang: str):
         ]
     ])
 
+def get_welcome_card(lang: str, first_name: str = ""):
+    cards = {
+        "lat": (
+            f"🎓 <b>Assalomu alaykum{', ' + first_name if first_name else ''}!</b>\n\n"
+            "<b>Abivtivkabot</b> — talabalar va bitiruvchilar uchun davlat standarti bo'yicha "
+            "rasmiy <b>Obyektivka (Ma'lumotnoma)</b> tayyorlab beruvchi zamonaviy platforma.\n\n"
+            "✨ <b>Imkoniyatlar:</b>\n"
+            "• ⚡️ <b>Aqlli kiritish</b> — matndan avtomatik to'ldirish\n"
+            "• 📸 <b>3x4 rasm</b> — galereyadan qirqib joylash\n"
+            "• 📄 <b>Word va PDF</b> — tahrirlanadigan va tayyor formatlar\n"
+            "• 🆓 <b>100% bepul</b> va reklamasiz\n\n"
+            "👇 <i>Quyidagi o'zingizga qulay usulni tanlang:</i>"
+        ),
+        "cyr": (
+            f"🎓 <b>Ассалому алайкум{', ' + first_name if first_name else ''}!</b>\n\n"
+            "<b>Abivtivkabot</b> — талабалар ва битирувчилар учун давлат стандарти бўйича "
+            "расмий <b>Объективка (Маълумотнома)</b> тайёрлаб берувчи замонавий платформа.\n\n"
+            "✨ <b>Имкониятлар:</b>\n"
+            "• ⚡️ <b>Ақлли киритиш</b> — матндан автоматик тўлдириш\n"
+            "• 📸 <b>3x4 расм</b> — галереядан қирқиб жойлаш\n"
+            "• 📄 <b>Word ва PDF</b> — таҳрирланадиган ва тайёр форматлар\n"
+            "• 🆓 <b>100% бепул</b> ва рекламасиз\n\n"
+            "👇 <i>Қуйидаги ўзингизга қулай усулни танланг:</i>"
+        ),
+        "ru": (
+            f"🎓 <b>Здравствуйте{', ' + first_name if first_name else ''}!</b>\n\n"
+            "<b>Abivtivkabot</b> — современная платформа для бесплатного создания официальной "
+            "<b>Объективки (Справки)</b> для студентов и выпускников.\n\n"
+            "✨ <b>Возможности:</b>\n"
+            "• ⚡️ <b>Умный ввод</b> — автозаполнение из текста\n"
+            "• 📸 <b>Фото 3x4</b> — загрузка прямо из галереи\n"
+            "• 📄 <b>Word и PDF</b> — готовые государственные форматы\n"
+            "• 🆓 <b>100% бесплатно</b>\n\n"
+            "👇 <i>Выберите удобный способ заполнения:</i>"
+        )
+    }
+    return cards.get(lang, cards["lat"])
+
 # ----------------- Buyruqlar -----------------
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data.get("lang", "lat")
     await state.clear()
-    await state.set_state(ObyektivkaStates.lang)
+    await state.update_data(lang=lang, relatives=[])
+    
+    first_name = message.from_user.first_name or ""
+    await message.answer(
+        get_welcome_card(lang, first_name),
+        reply_markup=get_main_menu_kb(lang)
+    )
+
+@dp.message(Command("lang"))
+async def cmd_lang(message: types.Message, state: FSMContext):
     await message.answer(CHOOSE_LANG, reply_markup=get_lang_kb())
+
+@dp.callback_query(F.data == "change_lang")
+async def cb_change_lang(call: types.CallbackQuery, state: FSMContext):
+    await call.message.edit_text(CHOOSE_LANG, reply_markup=get_lang_kb())
+    await call.answer()
 
 @dp.message(Command("cancel"))
 async def cmd_cancel(message: types.Message, state: FSMContext):
@@ -135,6 +200,7 @@ async def cmd_cancel(message: types.Message, state: FSMContext):
     lang = data.get("lang", "lat")
     await state.clear()
     await message.answer(T[lang]["cancelled"], reply_markup=ReplyKeyboardRemove())
+    await message.answer(get_welcome_card(lang), reply_markup=get_main_menu_kb(lang))
 
 # Til tanlash
 @dp.callback_query(F.data.startswith("setlang_"))
@@ -143,15 +209,12 @@ async def cb_set_lang(call: types.CallbackQuery, state: FSMContext):
     if lang not in LANGS:
         lang = "lat"
     await state.update_data(lang=lang, relatives=[])
-    await call.message.delete()
-    
-    welcome_text = {
-        "lat": "Obyektivkani qanday to'ldirishni xohlaysiz?",
-        "cyr": "Объективкани қандай тўлдиришни хоҳлайсиз?",
-        "ru": "Как вы хотите заполнить объективку?"
-    }.get(lang, "Obyektivkani qanday to'ldirishni xohlaysiz?")
-
-    await call.message.answer(f"{T[lang]['welcome']}\n\n<b>{welcome_text}</b>", reply_markup=get_main_menu_kb(lang))
+    first_name = call.from_user.first_name or ""
+    await call.message.edit_text(
+        get_welcome_card(lang, first_name),
+        reply_markup=get_main_menu_kb(lang)
+    )
+    await call.answer()
 
 # Bot ichida savol-javob orqali davom etish
 @dp.callback_query(F.data == "start_chat_flow")
@@ -161,6 +224,7 @@ async def cb_start_chat(call: types.CallbackQuery, state: FSMContext):
     await call.message.delete()
     await state.set_state(ObyektivkaStates.fio)
     await call.message.answer(T[lang]["fio"], reply_markup=ReplyKeyboardRemove())
+    await call.answer()
 
 # 1. FIO
 @dp.message(ObyektivkaStates.fio)
@@ -217,32 +281,29 @@ async def process_nationality(message: types.Message, state: FSMContext):
     lang = data["lang"]
     await state.update_data(nationality=message.text.strip())
     
-    await state.set_state(ObyektivkaStates.party)
-    await message.answer(T[lang]["party"], reply_markup=get_skip_kb(lang))
-
-# 6. Party
-@dp.message(ObyektivkaStates.party)
-async def process_party(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
-    await state.update_data(party=val.strip())
-    
     await state.set_state(ObyektivkaStates.education)
     await message.answer(T[lang]["education"], reply_markup=get_skip_kb(lang, extra_buttons=EDU[lang]))
 
-# 7. Education
+# 6. Education (Talaba uchun keraksiz maydonlarni avtomatik "yo'q" qilib ketamiz)
 @dp.message(ObyektivkaStates.education)
 async def process_education(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
     val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
-    await state.update_data(education=val.strip())
+    await state.update_data(
+        education=val.strip(),
+        party="",
+        degree="",
+        title="",
+        military="",
+        awards="",
+        deputy=""
+    )
     
     await state.set_state(ObyektivkaStates.graduated)
     await message.answer(T[lang]["graduated"], reply_markup=get_skip_kb(lang))
 
-# 8. Graduated
+# 7. Graduated
 @dp.message(ObyektivkaStates.graduated)
 async def process_graduated(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -253,7 +314,7 @@ async def process_graduated(message: types.Message, state: FSMContext):
     await state.set_state(ObyektivkaStates.specialty)
     await message.answer(T[lang]["specialty"], reply_markup=get_skip_kb(lang))
 
-# 9. Specialty
+# 8. Specialty
 @dp.message(ObyektivkaStates.specialty)
 async def process_specialty(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -261,32 +322,10 @@ async def process_specialty(message: types.Message, state: FSMContext):
     val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
     await state.update_data(specialty=val.strip())
     
-    await state.set_state(ObyektivkaStates.degree)
-    await message.answer(T[lang]["degree"], reply_markup=get_skip_kb(lang))
-
-# 10. Degree
-@dp.message(ObyektivkaStates.degree)
-async def process_degree(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
-    await state.update_data(degree=val.strip())
-    
-    await state.set_state(ObyektivkaStates.title)
-    await message.answer(T[lang]["title"], reply_markup=get_skip_kb(lang))
-
-# 11. Title
-@dp.message(ObyektivkaStates.title)
-async def process_title(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
-    await state.update_data(title=val.strip())
-    
     await state.set_state(ObyektivkaStates.languages)
     await message.answer(T[lang]["languages"], reply_markup=get_skip_kb(lang))
 
-# 12. Languages
+# 9. Languages
 @dp.message(ObyektivkaStates.languages)
 async def process_languages(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -294,43 +333,10 @@ async def process_languages(message: types.Message, state: FSMContext):
     val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
     await state.update_data(languages=val.strip())
     
-    await state.set_state(ObyektivkaStates.military)
-    await message.answer(T[lang]["military"], reply_markup=get_skip_kb(lang))
-
-# 13. Military
-@dp.message(ObyektivkaStates.military)
-async def process_military(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
-    await state.update_data(military=val.strip())
-    
-    await state.set_state(ObyektivkaStates.awards)
-    await message.answer(T[lang]["awards"], reply_markup=get_skip_kb(lang))
-
-# 14. Awards
-@dp.message(ObyektivkaStates.awards)
-async def process_awards(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
-    await state.update_data(awards=val.strip())
-    
-    await state.set_state(ObyektivkaStates.deputy)
-    await message.answer(T[lang]["deputy"], reply_markup=get_skip_kb(lang))
-
-# 15. Deputy
-@dp.message(ObyektivkaStates.deputy)
-async def process_deputy(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
-    await state.update_data(deputy=val.strip())
-    
     await state.set_state(ObyektivkaStates.photo)
     await message.answer(T[lang]["photo"], reply_markup=get_skip_kb(lang))
 
-# 16. Photo
+# 10. Photo
 @dp.message(ObyektivkaStates.photo, F.photo)
 async def process_photo(message: types.Message, state: FSMContext, bot: Bot):
     photo = message.photo[-1]
@@ -356,7 +362,7 @@ async def process_photo_text(message: types.Message, state: FSMContext):
     else:
         await message.answer(T[lang]["photo_need"], reply_markup=get_skip_kb(lang))
 
-# 17. Work
+# 11. Work
 @dp.message(ObyektivkaStates.work)
 async def process_work(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -368,7 +374,7 @@ async def process_work(message: types.Message, state: FSMContext):
     await state.set_state(ObyektivkaStates.rel_kind)
     await message.answer(T[lang]["rel_kind"], reply_markup=get_skip_kb(lang, extra_buttons=REL_KINDS[lang]))
 
-# 18. Relatives
+# 12. Relatives
 @dp.message(ObyektivkaStates.rel_kind)
 async def process_rel_kind(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -449,6 +455,17 @@ async def process_rel_ask_more(message: types.Message, state: FSMContext):
     else:
         await message.answer(T[lang]["press_button"], reply_markup=get_rel_more_kb(lang))
 
+# Istalgan boshqa matn yozilganda asosiy menyuni chiqarish
+@dp.message()
+async def fallback_handler(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data.get("lang", "lat")
+    first_name = message.from_user.first_name or ""
+    await message.answer(
+        get_welcome_card(lang, first_name),
+        reply_markup=get_main_menu_kb(lang)
+    )
+
 async def show_finish_menu(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
@@ -480,8 +497,9 @@ async def cb_download(call: types.CallbackQuery, state: FSMContext):
     
     if action == "restart":
         await state.clear()
-        await state.set_state(ObyektivkaStates.lang)
-        await call.message.answer(CHOOSE_LANG, reply_markup=get_lang_kb())
+        await state.update_data(lang=lang, relatives=[])
+        first_name = call.from_user.first_name or ""
+        await call.message.answer(get_welcome_card(lang, first_name), reply_markup=get_main_menu_kb(lang))
         await call.answer()
         return
         
@@ -510,12 +528,40 @@ async def cb_download(call: types.CallbackQuery, state: FSMContext):
         logging.error(f"Generate error: {e}", exc_info=True)
         await msg_wait.edit_text(T[lang]["error"])
 
+async def keep_alive_ping():
+    """Render Free serveri uxlab qolmasligi uchun har 10 daqiqada o'zini uyg'otib turadi."""
+    while True:
+        await asyncio.sleep(600) # 10 daqiqa
+        if WEBAPP_URL:
+            try:
+                await asyncio.to_thread(urllib.request.urlopen, f"{WEBAPP_URL}/health", None, 10)
+            except Exception:
+                pass
+
 async def start_bot():
     if not BOT_TOKEN:
         print("XATOLIK: BOT_TOKEN topilmadi!")
         return
-    bot = Bot(token=BOT_TOKEN)
-    print("Telegram Bot polling boshlandi...")
+        
+    bot = Bot(
+        token=BOT_TOKEN,
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+    )
+    
+    # Webhook bo'lsa tozalab yuboramiz va Menu tugmasini o'rnatamiz
+    try:
+        await bot.delete_webhook(drop_pending_updates=True)
+        if WEBAPP_URL:
+            await bot.set_chat_menu_button(
+                menu_button=MenuButtonWebApp(text="📋 Obyektivka", web_app=WebAppInfo(url=WEBAPP_URL))
+            )
+    except Exception as e:
+        print(f"Init setup warning: {e}")
+
+    # Keep-alive vazifasini fonda ishga tushiramiz
+    asyncio.create_task(keep_alive_ping())
+
+    print("Telegram Bot polling boshlandi (24/7 rejim)...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

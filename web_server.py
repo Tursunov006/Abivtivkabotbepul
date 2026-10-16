@@ -63,6 +63,10 @@ async def serve_index():
     index_file = STATIC_DIR / "index.html"
     return HTMLResponse(content=index_file.read_text(encoding="utf-8"))
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "service": "Abivtivkabot 24/7"}
+
 @app.post("/api/generate")
 async def generate_document(req: GenerateRequest):
     req_id = str(uuid.uuid4())[:8]
