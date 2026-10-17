@@ -529,14 +529,21 @@ async def cb_download(call: types.CallbackQuery, state: FSMContext):
         await msg_wait.edit_text(T[lang]["error"])
 
 async def keep_alive_ping():
-    """Render Free serveri uxlab qolmasligi uchun har 10 daqiqada o'zini uyg'otib turadi."""
+    """Render Free serveri uxlab qolmasligi uchun har 4 daqiqada o'zini uyg'otib turadi."""
+    target_url = (os.getenv("RENDER_EXTERNAL_URL") or WEBAPP_URL or "https://abivtivkabotbepul.onrender.com").rstrip("/")
     while True:
-        await asyncio.sleep(600) # 10 daqiqa
-        if WEBAPP_URL:
-            try:
-                await asyncio.to_thread(urllib.request.urlopen, f"{WEBAPP_URL}/health", None, 10)
-            except Exception:
-                pass
+        await asyncio.sleep(240)  # Har 4 daqiqada (Render 15 daqiqada uxlab qoladi)
+        if target_url:
+            for path in ("/health", "/"):
+                try:
+                    req = urllib.request.Request(
+                        f"{target_url}{path}",
+                        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) KeepAlive/1.0"}
+                    )
+                    await asyncio.to_thread(urllib.request.urlopen, req, None, 10)
+                    break
+                except Exception:
+                    pass
 
 async def start_bot():
     if not BOT_TOKEN:
