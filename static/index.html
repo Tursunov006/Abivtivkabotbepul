@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Talaba Obyektivkasi — Abivtivkabot</title>
+  <title>Talaba Obyektivkasi (Ma’lumotnoma)</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -127,6 +127,8 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .smart-badge {
@@ -142,7 +144,7 @@
       background: #ffffff;
       color: #b45309;
       border: 1px solid #fcd34d;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 20px;
       font-size: 11px;
       font-weight: 700;
@@ -151,8 +153,8 @@
 
     .smart-textarea {
       width: 100%;
-      height: 62px;
-      padding: 9px 11px;
+      height: 55px;
+      padding: 8px 10px;
       border: 1px solid #fcd34d;
       border-radius: 10px;
       font-size: 12px;
@@ -298,8 +300,8 @@
     .photo-box {
       width: 62px;
       height: 82px;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 8px;
+      border: 1.5px solid #4A6984;
+      border-radius: 4px;
       background: #ffffff;
       display: flex;
       align-items: center;
@@ -340,30 +342,6 @@
     .hint {
       font-size: 10.5px;
       color: var(--text-muted);
-    }
-
-    /* AKKORDEON */
-    .acc-btn {
-      width: 100%;
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 9px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #475569;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-    }
-
-    .acc-body {
-      display: none;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px dashed var(--border);
     }
 
     /* QARINDOSHLAR */
@@ -493,8 +471,8 @@
       <div class="hero-brand">
         <div class="hero-icon">🎓</div>
         <div>
-          <h1 id="appTitle">Talaba Obyektivkasi</h1>
-          <p id="appSub">Davlat standarti bo'yicha rasmiy ma'lumotnoma</p>
+          <h1 id="appTitle">MA’LUMOTNOMA</h1>
+          <p id="appSub">Talabalar uchun rasmiy obyektivka platformasi</p>
         </div>
       </div>
     </div>
@@ -508,50 +486,86 @@
   <!-- AQLLI TEZKOR KIRITISH -->
   <div class="smart-box">
     <div class="smart-header">
-      <div class="smart-badge">⚡️ <span id="lblSmartTitle">Aqlli tezkor to'ldirish</span></div>
-      <button type="button" class="demo-btn" onclick="fillDemoStudent()" id="btnDemo">🎯 Namuna to'ldirish</button>
+      <div class="smart-badge">⚡️ <span id="lblSmartTitle">1-bosishda tayyor namuna</span></div>
+      <button type="button" class="demo-btn" onclick="fillRustamjonSample()" id="btnDemo">🎯 Namuna to‘ldirish (O‘rinov Rustamjon)</button>
     </div>
-    <textarea class="smart-textarea" id="smartInput" placeholder="Matn yozing: Tursunov Ibrohim 24.07.2006 Qashqadaryo viloyati Qarshi tumani. Qarshi davlat universiteti talabasi"></textarea>
+    <textarea class="smart-textarea" id="smartInput" placeholder="Yoki o'zingiz haqingizda yozing: O‘rinov Rustamjon Akmaljon o‘g‘li 14.07.2003 Farg‘ona viloyati Uchko‘prik tumani"></textarea>
     <button type="button" class="smart-action-btn" onclick="parseSmartText()">
-      ✨ <span id="btnSmartParse">Matndan avtomatik to'ldirish</span>
+      ✨ <span id="btnSmartParse">Matndan avtomatik to‘ldirish</span>
     </button>
   </div>
 
   <form id="obyektivkaForm" oninput="saveDraft()" onsubmit="return false;">
 
-    <!-- 1. SHAXSIY MA'LUMOTLAR -->
+    <!-- 1. TALABA ASOSIY MA'LUMOTLARI -->
     <div class="card">
       <div class="card-header">
-        <div class="card-title">👤 <span id="lblSecPersonal">Shaxsiy ma'lumotlar</span></div>
+        <div class="card-title">👤 <span id="lblSecPersonal">Talaba ma’lumotlari</span></div>
         <button type="button" class="clear-btn" onclick="clearForm()">🗑 Tozalash</button>
       </div>
 
       <div class="field">
-        <label id="lblFio">F.I.Sh. (Familiya, ism, sharif) *</label>
-        <input type="text" id="fio" required placeholder="Masalan: Tursunov Ibrohim Meyli o'g'li">
+        <label id="lblFio">Familiya, ism va otasining ismi *</label>
+        <input type="text" id="fio" required placeholder="Masalan: O‘rinov Rustamjon Akmaljon o‘g‘li">
+      </div>
+
+      <div class="field">
+        <label id="lblPosition">Universitet, fakultet, yo‘nalish, guruh va kurs *</label>
+        <textarea id="position" rows="3" placeholder="Axborot texnologiyalari va menejment universiteti,&#10;Ijtimoiy fanlar fakulteti Filologiya va tillarni o‘qitish (arab tili) ta’lim yo‘nalishi Ar-125-24-guruh, 1-kurs talabasi"></textarea>
       </div>
 
       <div class="field-row">
         <div>
-          <label id="lblBirthDate">Tug'ilgan sana *</label>
-          <input type="text" id="birth_date" required placeholder="24.07.2006">
+          <label id="lblBirthDate">Tug‘ilgan yili *</label>
+          <input type="text" id="birth_date" required placeholder="14.07.2003 y">
         </div>
         <div>
           <label id="lblNationality">Millati *</label>
-          <input type="text" id="nationality" required value="o'zbek">
+          <input type="text" id="nationality" required value="O‘zbek">
         </div>
       </div>
 
       <div class="field">
-        <label id="lblBirthPlace">Tug'ilgan joyi (viloyat, tuman/shahar) *</label>
-        <input type="text" id="birth_place" required placeholder="Masalan: Qashqadaryo viloyati, Qarshi tumani">
+        <label id="lblBirthPlace">Tug‘ilgan joyi *</label>
+        <input type="text" id="birth_place" required placeholder="Masalan: Farg‘ona viloyati Uchko‘prik tumani">
         <div class="chips">
+          <span class="chip" onclick="setVal('birth_place', 'Farg‘ona viloyati ')">Farg‘ona</span>
+          <span class="chip" onclick="setVal('birth_place', 'Qashqadaryo viloyati ')">Qashqadaryo</span>
           <span class="chip" onclick="setVal('birth_place', 'Toshkent shahri')">Toshkent sh.</span>
-          <span class="chip" onclick="setVal('birth_place', 'Qashqadaryo viloyati, ')">Qashqadaryo</span>
-          <span class="chip" onclick="setVal('birth_place', 'Samarqand viloyati, ')">Samarqand</span>
-          <span class="chip" onclick="setVal('birth_place', 'Farg\'ona viloyati, ')">Farg'ona</span>
-          <span class="chip" onclick="setVal('birth_place', 'Andijon viloyati, ')">Andijon</span>
+          <span class="chip" onclick="setVal('birth_place', 'Samarqand viloyati ')">Samarqand</span>
+          <span class="chip" onclick="setVal('birth_place', 'Andijon viloyati ')">Andijon</span>
         </div>
+      </div>
+
+      <div class="field">
+        <label id="lblSpecialty">Ta’lim yo‘nalishi *</label>
+        <input type="text" id="specialty" placeholder="Masalan: Filologiya va tillarni o‘qitish (arab tili)">
+      </div>
+
+      <div class="field">
+        <label id="lblGraduated">Tamomlagan (yil va maktab/litsey) *</label>
+        <input type="text" id="graduated" placeholder="Masalan: 2021-yil Uchko‘prik t. 5-umumiy o‘rta ta’lim maktabi">
+      </div>
+
+      <div class="field">
+        <label id="lblContact">Telefon nomeri *</label>
+        <input type="text" id="contact" placeholder="Masalan: +998943987505">
+      </div>
+
+      <div class="field">
+        <label id="lblLanguages">Qaysi chet tillarini biladi</label>
+        <input type="text" id="languages" placeholder="Masalan: Arab tili (sertifikat At Tanal B1)">
+        <div class="chips">
+          <span class="chip" onclick="setVal('languages', 'Ingliz tili (IELTS 6.0)')">Ingliz tili (IELTS)</span>
+          <span class="chip" onclick="setVal('languages', 'Rus, ingliz tillari')">Rus, ingliz</span>
+          <span class="chip" onclick="setVal('languages', 'Arab tili (sertifikat B1)')">Arab tili (B1)</span>
+          <span class="chip" onclick="setVal('languages', 'yo‘q')">yo‘q</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label id="lblAwards">Davlat mukofotlari bilan taqdirlanganmi (qanaqa)</label>
+        <input type="text" id="awards" value="yo‘q" placeholder="yo‘q">
       </div>
 
       <div class="field">
@@ -561,114 +575,33 @@
           <div class="photo-actions">
             <label class="btn-upload" for="photoInput" id="btnChoosePhoto">📷 Rasm tanlash</label>
             <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
-            <span class="hint" id="photoHint">Rasmiy 3x4 rasm (ixtiyoriy)</span>
+            <span class="hint" id="photoHint">O'ng tepa burchakka rasmiy ramkada joylashadi</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 2. O'QISH JOYI -->
+    <!-- 2. SHAXSIY MA'LUMOTLARI (OILA A'ZOLARI JADVALI) -->
     <div class="card">
       <div class="card-header">
-        <div class="card-title">🎓 <span id="lblSecEdu">O'qish va ta'lim</span></div>
+        <div class="card-title">👨‍👩‍👧 <span id="lblSecRel">SHAXSIY MA’LUMOTLARI</span></div>
       </div>
-
-      <div class="field">
-        <label id="lblEducation">Ma'lumoti</label>
-        <select id="education">
-          <option value="Tugallanmagan oliy" selected>Tugallanmagan oliy (Talaba)</option>
-          <option value="Oliy">Oliy (Bitirgan)</option>
-          <option value="O'rta maxsus">O'rta maxsus (Texnikum / Kollej)</option>
-          <option value="O'rta">O'rta (Maktab)</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label id="lblGraduated">Qaysi OTMda o'qiysiz (yoki maktab/litsey)</label>
-        <input type="text" id="graduated" placeholder="Masalan: Qarshi davlat universiteti (kunduzgi)">
-        <div class="chips">
-          <span class="chip" onclick="setUni('O\'zbekiston Milliy universiteti')">O'zMU</span>
-          <span class="chip" onclick="setUni('Toshkent axborot texnologiyalari universiteti')">TATU</span>
-          <span class="chip" onclick="setUni('Toshkent davlat iqtisodiyot universiteti')">TDIU</span>
-          <span class="chip" onclick="setUni('Toshkent davlat texnika universiteti')">TDTU</span>
-          <span class="chip" onclick="setUni('Qarshi davlat universiteti')">QarDU</span>
-          <span class="chip" onclick="setUni('Samarqand davlat universiteti')">SamDU</span>
-        </div>
-      </div>
-
-      <div class="field">
-        <label id="lblSpecialty">Yo'nalishingiz (Fakultet / Mutaxassislik)</label>
-        <input type="text" id="specialty" placeholder="Masalan: Dasturiy injiniring">
-      </div>
-
-      <div class="field">
-        <label id="lblPosition">Hozirgi maqomingiz (Kurs va OTM)</label>
-        <input type="text" id="position" placeholder="Masalan: Qarshi davlat universiteti 2-bosqich talabasi">
-      </div>
-
-      <div class="field">
-        <label id="lblLanguages">Chet tillari</label>
-        <input type="text" id="languages" placeholder="Masalan: rus, ingliz">
-        <div class="chips">
-          <span class="chip" onclick="setVal('languages', 'rus, ingliz')">rus, ingliz</span>
-          <span class="chip" onclick="setVal('languages', 'ingliz tili')">ingliz tili</span>
-          <span class="chip" onclick="setVal('languages', 'rus tili')">rus tili</span>
-          <span class="chip" onclick="setVal('languages', 'yo\'q')">yo'q</span>
-        </div>
-      </div>
-
-      <div class="field">
-        <label id="lblWork">Mehnat va o'qish faoliyati</label>
-        <textarea id="work" rows="3" placeholder="2013-2024 yy. - 16-maktab o'quvchisi&#10;2024 y. - h.v. - Universitet talabasi"></textarea>
-      </div>
-
-      <button type="button" class="acc-btn" onclick="toggleExtra()">
-        <span>⚙️ Qo'shimcha rasmiy bandlar (avtomatik "yo'q")</span>
-        <span id="accIcon">▼</span>
-      </button>
-
-      <div class="acc-body" id="extraBox">
-        <div class="field-row">
-          <div>
-            <label id="lblParty">Partiyaviyligi</label>
-            <input type="text" id="party" placeholder="yo'q">
-          </div>
-          <div>
-            <label id="lblMilitary">Harbiy unvoni</label>
-            <input type="text" id="military" placeholder="yo'q">
-          </div>
-        </div>
-        <div class="field-row">
-          <div>
-            <label id="lblDegree">Ilmiy darajasi</label>
-            <input type="text" id="degree" placeholder="yo'q">
-          </div>
-          <div>
-            <label id="lblTitle">Ilmiy unvoni</label>
-            <input type="text" id="title" placeholder="yo'q">
-          </div>
-        </div>
-        <div class="field">
-          <label id="lblAwards">Davlat mukofotlari</label>
-          <input type="text" id="awards" placeholder="yo'q">
-        </div>
-        <div class="field">
-          <label id="lblDeputy">Deputatlik</label>
-          <input type="text" id="deputy" placeholder="yo'q">
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. YAQIN QARINDOSHLAR -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">👨‍👩‍👧 <span id="lblSecRel">Yaqin qarindoshlari</span></div>
-      </div>
-      <p class="hint" style="margin-bottom: 10px;" id="lblRelHint">Otasi, onasi, aka-uka va opa-singillari haqida ma'lumot</p>
+      <p class="hint" style="margin-bottom: 10px;" id="lblRelHint">Otasi, onasi, akasi, ukasi, opasi, singlisi (Jadval ustunlari: Qarindoshligi | F.I.Sh | Tug'ilgan sanasi | Manzili | Kasbi/ish joyi)</p>
 
       <div id="relativesList"></div>
 
-      <button type="button" class="btn-add" onclick="addRelativeRow()" id="btnAddRel">+ Qarindosh qo'shish</button>
+      <button type="button" class="btn-add" onclick="addRelativeRow()" id="btnAddRel">+ Oila a’zosini qo‘shish</button>
+    </div>
+
+    <!-- 3. ERISHGAN YUTUQLARI -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🏆 <span id="lblSecAch">ERISHGAN YUTUQLARI</span></div>
+      </div>
+      <div class="field">
+        <label id="lblAchHint">Har bir yutuqni yangi qatordan yozing (avtomatik 1., 2., 3. raqamlanadi):</label>
+        <textarea id="achievements" rows="5" placeholder="25 noyabr 2024 yilda Universitetda bo‘lib o‘tgan “Ma’rifat Ulashib” loyihasi doirasida zakovat musobaqasida 2-o‘rinni qo‘lga kiritgani uchun Tashakkurnoma bilan taqdirlangan.&#10;30-yanvar 2025 yilda S.Nasafiy Kutubxonasida bo‘lib o‘tgan tadbirda faol ishtiroki uchun TASHAKKURNOMA bilan taqdirlangan.&#10;10 fevral 2025 yilda Matematika fanidan onlayn olimpiadada sertifikat bilan taqdirlangan"></textarea>
+      </div>
     </div>
 
   </form>
@@ -695,106 +628,106 @@
 
     const UI_TEXT = {
       lat: {
-        appTitle: "Talaba Obyektivkasi",
-        appSub: "Davlat standarti bo'yicha rasmiy ma'lumotnoma",
-        lblSmartTitle: "Aqlli tezkor to'ldirish",
-        btnDemo: "🎯 Namuna to'ldirish",
-        btnSmartParse: "Matndan avtomatik to'ldirish",
-        lblSecPersonal: "Shaxsiy ma'lumotlar",
-        lblFio: "F.I.Sh. (Familiya, ism, sharif) *",
-        lblBirthDate: "Tug'ilgan sana *",
-        lblBirthPlace: "Tug'ilgan joyi (viloyat, tuman/shahar) *",
+        appTitle: "MA’LUMOTNOMA",
+        appSub: "Talabalar uchun rasmiy obyektivka platformasi",
+        lblSmartTitle: "1-bosishda tayyor namuna",
+        btnDemo: "🎯 Namuna to‘ldirish (O‘rinov Rustamjon)",
+        btnSmartParse: "Matndan avtomatik to‘ldirish",
+        lblSecPersonal: "Talaba ma’lumotlari",
+        lblFio: "Familiya, ism va otasining ismi *",
+        lblPosition: "Universitet, fakultet, yo‘nalish, guruh va kurs *",
+        lblBirthDate: "Tug‘ilgan yili *",
+        lblBirthPlace: "Tug‘ilgan joyi *",
         lblNationality: "Millati *",
+        lblSpecialty: "Ta’lim yo‘nalishi *",
+        lblGraduated: "Tamomlagan (yil va maktab/litsey) *",
+        lblContact: "Telefon nomeri *",
+        lblLanguages: "Qaysi chet tillarini biladi",
+        lblAwards: "Davlat mukofotlari bilan taqdirlanganmi (qanaqa)",
         lblPhoto: "3x4 Rasm",
         btnChoosePhoto: "📷 Rasm tanlash",
-        photoHint: "Rasmiy 3x4 rasm (ixtiyoriy)",
-        lblSecEdu: "O'qish va ta'lim",
-        lblEducation: "Ma'lumoti",
-        lblGraduated: "Qaysi OTMda o'qiysiz (yoki maktab/litsey)",
-        lblSpecialty: "Yo'nalishingiz (Fakultet / Mutaxassislik)",
-        lblPosition: "Hozirgi maqomingiz (Kurs va OTM)",
-        lblLanguages: "Chet tillari",
-        lblWork: "Mehnat va o'qish faoliyati",
-        lblSecRel: "Yaqin qarindoshlari",
-        lblRelHint: "Otasi, onasi, aka-uka va opa-singillari haqida ma'lumot",
-        btnAddRel: "+ Qarindosh qo'shish",
+        photoHint: "O'ng tepa burchakka rasmiy ramkada joylashadi",
+        lblSecRel: "SHAXSIY MA’LUMOTLARI",
+        lblRelHint: "Otasi, onasi, akasi, ukasi, opasi, singlisi",
+        btnAddRel: "+ Oila a’zosini qo‘shish",
+        lblSecAch: "ERISHGAN YUTUQLARI",
+        lblAchHint: "Har bir yutuqni yangi qatordan yozing (avtomatik 1., 2., 3. raqamlanadi):",
         btnDocxText: "Word (.docx)",
         btnPdfText: "PDF (.pdf)",
-        relKind: "Qarindoshligi",
-        relFio: "Familiya, ismi va otasining ismi",
-        relBirth: "Tug'ilgan yili va joyi",
-        relJob: "Ish joyi va lavozimi",
-        relAddr: "Turar joyi (manzili)",
-        eduOptions: ["Tugallanmagan oliy", "Oliy", "O'rta maxsus", "O'rta"],
-        relOptions: ["Otasi", "Onasi", "Akasi", "Ukasi", "Opasi", "Singlisi", "Turmush o'rtog'i"]
+        relKind: "Qarindoshligi (OTASI, ONASI...)",
+        relFio: "Familiyasi, ismi va otasining ismi",
+        relBirth: "Tug‘ilgan sanasi (1969.05.14)",
+        relAddr: "Yashash manzili (Viloyat, tuman, MFY/qishloq, uy)",
+        relJob: "Kasbi yoki ish joyi (Fermer, Uy bekasi, O‘qituvchi...)",
+        relOptions: ["OTASI", "ONASI", "AKASI", "UKASI", "OPASI", "SINGLISI", "TURMUSH O‘RTOG‘I"]
       },
       cyr: {
-        appTitle: "Талаба Объективкаси",
-        appSub: "Давлат стандарти бўйича расмий маълумотнома",
-        lblSmartTitle: "Ақлли тезкор тўлдириш",
-        btnDemo: "🎯 Намуна тўлдириш",
+        appTitle: "МАЪЛУМОТНОМА",
+        appSub: "Талабалар учун расмий объективка платформаси",
+        lblSmartTitle: "1-босишда тайёр намуна",
+        btnDemo: "🎯 Намуна тўлдириш (Ўринов Рустамжон)",
         btnSmartParse: "Матндан автоматик тўлдириш",
-        lblSecPersonal: "Шахсий маълумотлар",
-        lblFio: "Ф.И.Ш. (Фамилия, исм, шариф) *",
-        lblBirthDate: "Туғилган сана *",
-        lblBirthPlace: "Туғилган жойи (вилоят, туман/шаҳар) *",
+        lblSecPersonal: "Талаба маълумотлари",
+        lblFio: "Фамилия, исм ва отасининг исми *",
+        lblPosition: "Университет, факультет, йўналиш, гуруҳ ва курс *",
+        lblBirthDate: "Туғилган йили *",
+        lblBirthPlace: "Туғилган жойи *",
         lblNationality: "Миллати *",
+        lblSpecialty: "Таълим йўналиши *",
+        lblGraduated: "Тамомлаган (йил ва мактаб/лицей) *",
+        lblContact: "Телефон номери *",
+        lblLanguages: "Қайси чет тилларини билади",
+        lblAwards: "Давлат мукофотлари билан тақдирланганми (қанақа)",
         lblPhoto: "3x4 Расм",
         btnChoosePhoto: "📷 Расм танлаш",
-        photoHint: "Расмий 3x4 расм (ихтиёрий)",
-        lblSecEdu: "Ўқиш ва таълим",
-        lblEducation: "Маълумоти",
-        lblGraduated: "Қайси ОТМда ўқийсиз (ёки мактаб/лицей)",
-        lblSpecialty: "Йўналишингиз (Факультет / Мутахассислик)",
-        lblPosition: "Ҳозирги мақомингиз (Курс ва ОТМ)",
-        lblLanguages: "Чет тиллари",
-        lblWork: "Меҳнат ва ўқиш фаолияти",
-        lblSecRel: "Яқин қариндошлари",
-        lblRelHint: "Отаси, онаси, ака-ука ва опа-сингиллари ҳақида маълумот",
-        btnAddRel: "+ Қариндош қўшиш",
+        photoHint: "Ўнг тепа бурчакка расмий рамкада жойлашади",
+        lblSecRel: "ШАХСИЙ МАЪЛУМОТЛАРИ",
+        lblRelHint: "Отаси, онаси, акаси, укаси, опаси, синглиси",
+        btnAddRel: "+ Оила аъзосини қўшиш",
+        lblSecAch: "ЭРИШГАН ЮТУҚЛАРИ",
+        lblAchHint: "Ҳар бир ютуқни янги қатордан ёзинг (автоматик 1., 2., 3. рақамланади):",
         btnDocxText: "Word (.docx)",
         btnPdfText: "PDF (.pdf)",
-        relKind: "Қариндошлиги",
-        relFio: "Фамилия, исми ва отасининг исми",
-        relBirth: "Туғилган йили ва жойи",
-        relJob: "Иш жойи ва лавозими",
-        relAddr: "Турар жойи (манзили)",
-        eduOptions: ["Тугалланмаган олий", "Олий", "Ўрта махсус", "Ўрта"],
-        relOptions: ["Отаси", "Онаси", "Акаси", "Укаси", "Опаси", "Синглиси", "Турмуш ўртоғи"]
+        relKind: "Қариндошлиги (ОТАСИ, ОНАСИ...)",
+        relFio: "Фамилияси, исми ва отасининг исми",
+        relBirth: "Туғилган санаси (1969.05.14)",
+        relAddr: "Яшаш манзили",
+        relJob: "Касби ёки иш жойи",
+        relOptions: ["ОТАСИ", "ОНАСИ", "АКАСИ", "УКАСИ", "ОПАСИ", "СИНГЛИСИ", "ТУРМУШ ЎРТОҒИ"]
       },
       ru: {
-        appTitle: "Объективка Студента",
-        appSub: "Официальная справка по госстандарту",
-        lblSmartTitle: "Умное быстрое заполнение",
-        btnDemo: "🎯 Образец",
+        appTitle: "СПРАВКА-ОБЪЕКТИВКА",
+        appSub: "Официальная студенческая объективка",
+        lblSmartTitle: "Готовый образец в 1 клик",
+        btnDemo: "🎯 Заполнить образец",
         btnSmartParse: "Заполнить автоматически из текста",
-        lblSecPersonal: "Личные данные",
-        lblFio: "Ф.И.О. *",
+        lblSecPersonal: "Данные студента",
+        lblFio: "Фамилия, имя и отчество *",
+        lblPosition: "Университет, факультет, направление, группа и курс *",
         lblBirthDate: "Дата рождения *",
         lblBirthPlace: "Место рождения *",
         lblNationality: "Национальность *",
+        lblSpecialty: "Направление обучения *",
+        lblGraduated: "Окончил(а) (год и школа/лицей) *",
+        lblContact: "Номер телефона *",
+        lblLanguages: "Какими иностранными языками владеет",
+        lblAwards: "Награждён(а) ли гос. наградами (какими)",
         lblPhoto: "Фото 3x4",
         btnChoosePhoto: "📷 Выбрать фото",
-        photoHint: "Официальное фото 3x4 (необязательно)",
-        lblSecEdu: "Учёба и образование",
-        lblEducation: "Образование",
-        lblGraduated: "ВУЗ (где учитесь / окончили)",
-        lblSpecialty: "Направление / Специальность",
-        lblPosition: "Текущий статус (Курс и ВУЗ)",
-        lblLanguages: "Иностранные языки",
-        lblWork: "Трудовая и учебная деятельность",
-        lblSecRel: "Близкие родственники",
-        lblRelHint: "Сведения об отце, матери, братьях и сёстрах",
-        btnAddRel: "+ Добавить родственника",
+        photoHint: "Размещается в правом верхнем углу",
+        lblSecRel: "ЛИЧНЫЕ СВЕДЕНИЯ",
+        lblRelHint: "Отец, мать, братья, сёстры",
+        btnAddRel: "+ Добавить члена семьи",
+        lblSecAch: "ДОСТИЖЕНИЯ",
+        lblAchHint: "Каждое достижение укажите с новой строки (нумеруется автоматически):",
         btnDocxText: "Word (.docx)",
         btnPdfText: "PDF (.pdf)",
         relKind: "Степень родства",
         relFio: "Фамилия, имя, отчество",
-        relBirth: "Год и место рождения",
-        relJob: "Место работы и должность",
-        relAddr: "Место жительства",
-        eduOptions: ["Неоконченное высшее", "Высшее", "Среднее специальное", "Среднее"],
-        relOptions: ["Отец", "Мать", "Брат", "Сестра", "Супруг(а)"]
+        relBirth: "Дата рождения (1969.05.14)",
+        relAddr: "Адрес проживания",
+        relJob: "Род занятий / место работы",
+        relOptions: ["ОТЕЦ", "МАТЬ", "БРАТ", "СЕСТРА", "СУПРУГ(А)"]
       }
     };
 
@@ -802,26 +735,8 @@
       const el = document.getElementById(id);
       if (el) {
         el.value = val;
-        el.focus();
         saveDraft();
       }
-    }
-
-    function setUni(uniName) {
-      document.getElementById('graduated').value = uniName + " (kunduzgi)";
-      document.getElementById('position').value = uniName + " talabasi";
-      if (!document.getElementById('work').value.trim()) {
-        document.getElementById('work').value = `2023 y. - h.v. - ${uniName} talabasi`;
-      }
-      saveDraft();
-    }
-
-    function toggleExtra() {
-      const box = document.getElementById('extraBox');
-      const icon = document.getElementById('accIcon');
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      icon.innerText = open ? '▼' : '▲';
     }
 
     function setLang(lang) {
@@ -836,18 +751,7 @@
         if (el && typeof val === 'string') el.innerText = val;
       }
 
-      const eduSelect = document.getElementById('education');
-      eduSelect.innerHTML = '';
-      t.eduOptions.forEach((opt, i) => {
-        const o = document.createElement('option');
-        o.value = opt;
-        o.innerText = opt;
-        if (i === 0) o.selected = true;
-        eduSelect.appendChild(o);
-      });
-
       document.querySelectorAll('.rel-kind-select').forEach(sel => {
-        const cur = sel.value;
         sel.innerHTML = '';
         t.relOptions.forEach(r => {
           const o = document.createElement('option');
@@ -858,66 +762,90 @@
       });
     }
 
-    // 🎯 1-tugma bilan tayyor Talaba namunasini to'ldirish
-    function fillDemoStudent() {
-      document.getElementById('fio').value = "Tursunov Ibrohim Meyli o'g'li";
-      document.getElementById('birth_date').value = "24.07.2006";
-      document.getElementById('birth_place').value = "Qashqadaryo viloyati, Qarshi tumani";
-      document.getElementById('nationality').value = "o'zbek";
-      document.getElementById('education').value = "Tugallanmagan oliy";
-      document.getElementById('graduated').value = "Qarshi davlat universiteti (kunduzgi)";
-      document.getElementById('specialty').value = "Axborot tizimlari va texnologiyalari";
-      document.getElementById('position').value = "Qarshi davlat universiteti 2-bosqich talabasi";
-      document.getElementById('languages').value = "rus, ingliz";
-      document.getElementById('work').value = "2013-2024 yy. - Qarshi tumani 16-maktab o'quvchisi\n2024 y. - h.v. - Qarshi davlat universiteti talabasi";
+    // 🎯 Siz yuborgan O'rinov Rustamjon namunasini 100% bir xil to'ldirish
+    function fillRustamjonSample() {
+      document.getElementById('fio').value = "O‘rinov Rustamjon Akmaljon o‘g‘li";
+      document.getElementById('position').value =
+        "Axborot texnologiyalari va menejment universiteti,\n" +
+        "Ijtimoiy fanlar fakulteti Filologiya va tillarni o‘qitish (arab tili) ta’lim\n" +
+        "yo‘nalishi Ar-125-24-guruh, 1-kurs talabasi";
+      document.getElementById('birth_date').value = "14.07.2003 y";
+      document.getElementById('birth_place').value = "Farg‘ona viloyati Uchko‘prik tumani";
+      document.getElementById('nationality').value = "O‘zbek";
+      document.getElementById('specialty').value = "Filologiya va tillarni o‘qitish (arab tili)";
+      document.getElementById('graduated').value = "2021-yil Uchko‘prik t. 5-umumiy o‘rta ta’lim maktabi";
+      document.getElementById('contact').value = "+998943987505";
+      document.getElementById('languages').value = "Arab tili (sertifikat At Tanal B1)";
+      document.getElementById('awards').value = "yo‘q";
 
       const container = document.getElementById('relativesList');
       container.innerHTML = '';
       addRelativeRow({
-        kind: "Otasi",
-        fio: "Tursunov Meyli Soxibovich",
-        birth: "1976-yil, Qashqadaryo viloyati, Qarshi tumani",
-        job: "Qarshi tumani MFY raisi",
-        addr: "Qashqadaryo viloyati, Qarshi tumani"
+        kind: "OTASI",
+        fio: "Madatov Akmaljon O’rinovich",
+        birth: "1969.05.14",
+        addr: "Farg’ona viloyati Uchko’prik tumani Qummozor qishlog’i 4-uy",
+        job: "Fermer"
       });
       addRelativeRow({
-        kind: "Onasi",
-        fio: "Tursunova Dilfuza Karimovna",
-        birth: "1980-yil, Qashqadaryo viloyati, Qarshi tumani",
-        job: "Qarshi tumani 16-maktab o'qituvchisi",
-        addr: "Qashqadaryo viloyati, Qarshi tumani"
+        kind: "ONASI",
+        fio: "Madatova Dilshodaxon Xomidovna",
+        birth: "1968.08.03",
+        addr: "Farg’ona viloyati Uchko’prik tumani Qummozor qishlog’i 4-uy",
+        job: "Uy bekasi"
       });
+      addRelativeRow({
+        kind: "AKASI",
+        fio: "O’rinov Abdurouf Akmaljon o’g’li",
+        birth: "1994.07.21",
+        addr: "Farg’ona viloyati Uchko’prik tumani Qummozor qishlog’i 4-uy",
+        job: "Tadbirkor"
+      });
+      addRelativeRow({
+        kind: "OPASI",
+        fio: "Jabborova Dilafuro’z Akmaljon qizi",
+        birth: "1996.10.13",
+        addr: "Farg’ona viloyati Buvayda tumani Jov qishlog’i 19-uy",
+        job: "Buvayda tumani 38-umumiy o’rta ta’lim maktbi Fizika fani o’qituvchisi"
+      });
+      addRelativeRow({
+        kind: "AKASI",
+        fio: "O’rinboyev Abdullajon Akmaljon o’g’li",
+        birth: "1998.12.05",
+        addr: "Farg’ona viloyati Uchko’prik tumani Qummozor qishlog’i 4-uy",
+        job: "Tadbirkor"
+      });
+
+      document.getElementById('achievements').value =
+        "25 noyabr 2024 yilda Universitetda bo’lib o’tgan “Marifat Ulashib “ loyihasi doirasida adiblar hayoti va ijodiga bag’ishlangan zakovat musobaqasida jamoa tarkibida 2-o’rinni qo’lga kiritgani uchun Tashakkurnoma bilan taqdirlangan.\n" +
+        "30-yanvar 2025 yilda S.Nasafiy Kutubxonasida bo’lib o’tgan “NE NAVO SO’ZAYLAGAY’’ nomli tadbirda faol ishtiroki uchun TASHAKKURNOMA bilan taqdirlangan.\n" +
+        "10 fevral 2025 yilda Matematika fanidan onlayn olimpiadada sertifikat bilan taqdirlangan";
+
       saveDraft();
     }
 
-    // ✨ Matndan avtomatik ajratib olish
     function parseSmartText() {
       const text = document.getElementById('smartInput').value.trim();
       if (!text) return;
 
-      const dateMatch = text.match(/(\d{1,2}[./-]\d{1,2}[./-]\d{2,4})/) || text.match(/(\d{4})[- ]?y/);
-      if (dateMatch) document.getElementById('birth_date').value = dateMatch[1];
+      const dateMatch = text.match(/(\d{1,2}[./-]\d{1,2}[./-]\d{2,4})/);
+      if (dateMatch) document.getElementById('birth_date').value = dateMatch[1] + " y";
 
       const words = text.split(/\s+/);
       if (words.length >= 2) {
         let fioGuess = words[0] + " " + words[1];
         if (words[2] && !/\d/.test(words[2])) {
           fioGuess += " " + words[2];
-          if (words[3] && (words[3].toLowerCase().includes("o'g'li") || words[3].toLowerCase().includes("qizi"))) {
+          if (words[3] && (words[3].toLowerCase().includes("o‘g‘li") || words[3].toLowerCase().includes("o'g'li") || words[3].toLowerCase().includes("qizi"))) {
             fioGuess += " " + words[3];
           }
         }
         document.getElementById('fio').value = fioGuess.replace(/[,.]/g, '');
       }
 
-      const placeMatch = text.match(/([A-Za-zА-Яа-яЎўҚқҒғҲҳ'ʻ`\s]+(?:viloyati|tumani|shahri)[A-Za-zА-Яа-яЎўҚқҒғҲҳ'ʻ`\s,]*)/i);
-      if (placeMatch) document.getElementById('birth_place').value = placeMatch[1].trim().replace(/\.$/, '');
-
-      const uniMatch = text.match(/([A-Za-zА-Яа-яЎўҚқҒғҲҳ'ʻ`\s]+(?:universiteti|instituti|akademiyasi|texnikumi))/i);
-      if (uniMatch) {
-        const u = uniMatch[1].trim();
-        document.getElementById('graduated').value = u + " (kunduzgi)";
-        document.getElementById('position').value = u + " talabasi";
+      const placeMatch = text.match(/([A-Za-zА-Яа-яЎўҚқҒғҲҳ'ʻ`\s]+(?:viloyati|tumani|shahri)[A-Za-zА-Яа-яЎўҚқҒғҲҳ'ʻ`\s]*)/i);
+      if (placeMatch) {
+        document.getElementById('birth_place').value = placeMatch[1].trim();
       }
 
       saveDraft();
@@ -950,46 +878,39 @@
         </div>
         <div class="field">
           <label>${t.relFio}</label>
-          <input type="text" name="rel_fio" value="${data.fio || ''}" placeholder="F.I.Sh.">
+          <input type="text" name="rel_fio" value="${data.fio || ''}" placeholder="Madatov Akmaljon O‘rinovich">
         </div>
         <div class="field">
           <label>${t.relBirth}</label>
-          <input type="text" name="rel_birth" value="${data.birth || ''}" placeholder="1976-yil, Qarshi tumani">
-        </div>
-        <div class="field">
-          <label>${t.relJob}</label>
-          <input type="text" name="rel_job" value="${data.job || ''}" placeholder="Ish joyi va lavozimi">
+          <input type="text" name="rel_birth" value="${data.birth || ''}" placeholder="1969.05.14">
         </div>
         <div class="field">
           <label>${t.relAddr}</label>
-          <input type="text" name="rel_addr" value="${data.addr || ''}" placeholder="Yashash manzili">
+          <input type="text" name="rel_addr" value="${data.addr || ''}" placeholder="Farg‘ona viloyati Uchko‘prik tumani Qummozor qishlog‘i 4-uy">
+        </div>
+        <div class="field">
+          <label>${t.relJob}</label>
+          <input type="text" name="rel_job" value="${data.job || ''}" placeholder="Fermer / Uy bekasi / O‘qituvchi">
         </div>
       `;
       container.appendChild(div);
     }
 
-    // Lokal xotirada saqlash (talaba yopib yuborsa ham o'chib ketmaydi)
     function saveDraft() {
       try {
-        const draft = {
-          fio: document.getElementById('fio').value,
-          birth_date: document.getElementById('birth_date').value,
-          birth_place: document.getElementById('birth_place').value,
-          nationality: document.getElementById('nationality').value,
-          education: document.getElementById('education').value,
-          graduated: document.getElementById('graduated').value,
-          specialty: document.getElementById('specialty').value,
-          position: document.getElementById('position').value,
-          languages: document.getElementById('languages').value,
-          work: document.getElementById('work').value
-        };
-        localStorage.setItem('obyektivka_draft_v2', JSON.stringify(draft));
+        const fields = ['fio', 'position', 'birth_date', 'birth_place', 'nationality', 'specialty', 'graduated', 'contact', 'languages', 'awards', 'achievements'];
+        const draft = {};
+        fields.forEach(k => {
+          const el = document.getElementById(k);
+          if (el) draft[k] = el.value;
+        });
+        localStorage.setItem('obyektivka_student_v4', JSON.stringify(draft));
       } catch (e) {}
     }
 
     function loadDraft() {
       try {
-        const raw = localStorage.getItem('obyektivka_draft_v2');
+        const raw = localStorage.getItem('obyektivka_student_v4');
         if (!raw) return;
         const d = JSON.parse(raw);
         for (const [k, v] of Object.entries(d)) {
@@ -1002,9 +923,9 @@
     function clearForm() {
       document.getElementById('obyektivkaForm').reset();
       document.getElementById('relativesList').innerHTML = '';
-      addRelativeRow({ kind: "Otasi" });
-      addRelativeRow({ kind: "Onasi" });
-      localStorage.removeItem('obyektivka_draft_v2');
+      addRelativeRow({ kind: "OTASI" });
+      addRelativeRow({ kind: "ONASI" });
+      localStorage.removeItem('obyektivka_student_v4');
     }
 
     async function submitDoc(format) {
@@ -1020,10 +941,10 @@
         const kind = item.querySelector('[name="rel_kind"]')?.value || '';
         const rfio = item.querySelector('[name="rel_fio"]')?.value.trim() || '';
         const birth = item.querySelector('[name="rel_birth"]')?.value.trim() || '';
-        const job = item.querySelector('[name="rel_job"]')?.value.trim() || '';
         const address = item.querySelector('[name="rel_addr"]')?.value.trim() || '';
-        if (rfio || job || birth) {
-          relatives.push({ kind, fio: rfio, birth, job, address });
+        const job = item.querySelector('[name="rel_job"]')?.value.trim() || '';
+        if (rfio || job || birth || address) {
+          relatives.push({ kind, fio: rfio, birth, address, job });
         }
       });
 
@@ -1037,17 +958,12 @@
         birth_date: document.getElementById('birth_date').value.trim(),
         birth_place: document.getElementById('birth_place').value.trim(),
         nationality: document.getElementById('nationality').value.trim(),
-        party: document.getElementById('party').value.trim() || "yo'q",
-        education: document.getElementById('education').value.trim(),
+        specialty: document.getElementById('specialty').value.trim(),
         graduated: document.getElementById('graduated').value.trim(),
-        specialty: document.getElementById('specialty').value.trim() || "yo'q",
-        degree: document.getElementById('degree').value.trim() || "yo'q",
-        title: document.getElementById('title').value.trim() || "yo'q",
-        languages: document.getElementById('languages').value.trim() || "yo'q",
-        military: document.getElementById('military').value.trim() || "yo'q",
-        awards: document.getElementById('awards').value.trim() || "yo'q",
-        deputy: document.getElementById('deputy').value.trim() || "yo'q",
-        work: document.getElementById('work').value.trim(),
+        contact: document.getElementById('contact').value.trim(),
+        languages: document.getElementById('languages').value.trim() || "yo‘q",
+        awards: document.getElementById('awards').value.trim() || "yo‘q",
+        achievements: document.getElementById('achievements').value.trim(),
         photo_base64: base64Photo,
         relatives: relatives,
         user_id: tgUserId,
@@ -1078,7 +994,7 @@
         window.URL.revokeObjectURL(url);
 
         if (tg && tg.showAlert) {
-          tg.showAlert(currentLang === 'ru' ? "✅ Готово! Файл также отправлен вам в Telegram-чат." : "✅ Tayyor! Obyektivka Telegram lichkangizga ham yuborildi.");
+          tg.showAlert(currentLang === 'ru' ? "✅ Готово! Файл также отправлен вам в Telegram." : "✅ Tayyor! Obyektivka Telegram lichkangizga ham yuborildi.");
         }
       } catch (err) {
         alert("Xatolik: " + err.message);
@@ -1087,10 +1003,9 @@
       }
     }
 
-    // Dastlabki yuklash
     loadDraft();
-    addRelativeRow({ kind: "Otasi" });
-    addRelativeRow({ kind: "Onasi" });
+    addRelativeRow({ kind: "OTASI" });
+    addRelativeRow({ kind: "ONASI" });
   </script>
 </body>
 </html>

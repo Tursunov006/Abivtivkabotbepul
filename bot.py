@@ -19,7 +19,7 @@ from aiogram.types import (
     WebAppInfo, MenuButtonWebApp
 )
 
-from texts import T, LANGS, EDU, REL_KINDS, CHOOSE_LANG, LANG_BUTTONS
+from texts import T, LANGS, REL_KINDS, CHOOSE_LANG, LANG_BUTTONS
 from generator_docx import generate_docx
 from generator_pdf import generate_pdf
 
@@ -38,24 +38,19 @@ class ObyektivkaStates(StatesGroup):
     birth_date = State()
     birth_place = State()
     nationality = State()
-    party = State()
-    education = State()
-    graduated = State()
     specialty = State()
-    degree = State()
-    title = State()
+    graduated = State()
+    contact = State()
     languages = State()
-    military = State()
     awards = State()
-    deputy = State()
     photo = State()
-    work = State()
     rel_kind = State()
     rel_fio = State()
     rel_birth = State()
-    rel_job = State()
     rel_address = State()
+    rel_job = State()
     rel_ask_more = State()
+    achievements = State()
     finished = State()
 
 dp = Dispatcher(storage=MemoryStorage())
@@ -137,22 +132,22 @@ def get_welcome_card(lang: str, first_name: str = ""):
     cards = {
         "lat": (
             f"🎓 <b>Assalomu alaykum{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Abivtivkabot</b> — talabalar va bitiruvchilar uchun davlat standarti bo'yicha "
-            "rasmiy <b>Obyektivka (Ma'lumotnoma)</b> tayyorlab beruvchi zamonaviy platforma.\n\n"
+            "<b>Abivtivkabot</b> — talabalar uchun rasmiy namuna asosida "
+            "<b>Obyektivka (Ma’lumotnoma)</b> tayyorlab beruvchi zamonaviy platforma.\n\n"
             "✨ <b>Imkoniyatlar:</b>\n"
-            "• ⚡️ <b>Aqlli kiritish</b> — matndan avtomatik to'ldirish\n"
-            "• 📸 <b>3x4 rasm</b> — galereyadan qirqib joylash\n"
+            "• 🎯 <b>Talaba namunasi</b> — OTM va dekanatlar talab qiladigan aniq shakl\n"
+            "• 📸 <b>3x4 rasm</b> — galereyadan yuklash\n"
             "• 📄 <b>Word va PDF</b> — tahrirlanadigan va tayyor formatlar\n"
             "• 🆓 <b>100% bepul</b> va reklamasiz\n\n"
             "👇 <i>Quyidagi o'zingizga qulay usulni tanlang:</i>"
         ),
         "cyr": (
             f"🎓 <b>Ассалому алайкум{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Abivtivkabot</b> — талабалар ва битирувчилар учун давлат стандарти бўйича "
-            "расмий <b>Объективка (Маълумотнома)</b> тайёрлаб берувчи замонавий платформа.\n\n"
+            "<b>Abivtivkabot</b> — талабалар учун расмий намуна асосида "
+            "<b>Объективка (Маълумотнома)</b> тайёрлаб берувчи замонавий платформа.\n\n"
             "✨ <b>Имкониятлар:</b>\n"
-            "• ⚡️ <b>Ақлли киритиш</b> — матндан автоматик тўлдириш\n"
-            "• 📸 <b>3x4 расм</b> — галереядан қирқиб жойлаш\n"
+            "• 🎯 <b>Талаба намунаси</b> — ОТМ ва деканатлар талаб қиладиган аниқ шакл\n"
+            "• 📸 <b>3x4 расм</b> — галереядан юклаш\n"
             "• 📄 <b>Word ва PDF</b> — таҳрирланадиган ва тайёр форматлар\n"
             "• 🆓 <b>100% бепул</b> ва рекламасиз\n\n"
             "👇 <i>Қуйидаги ўзингизга қулай усулни танланг:</i>"
@@ -160,9 +155,9 @@ def get_welcome_card(lang: str, first_name: str = ""):
         "ru": (
             f"🎓 <b>Здравствуйте{', ' + first_name if first_name else ''}!</b>\n\n"
             "<b>Abivtivkabot</b> — современная платформа для бесплатного создания официальной "
-            "<b>Объективки (Справки)</b> для студентов и выпускников.\n\n"
+            "студенческой <b>Объективки (Справки)</b>.\n\n"
             "✨ <b>Возможности:</b>\n"
-            "• ⚡️ <b>Умный ввод</b> — автозаполнение из текста\n"
+            "• 🎯 <b>Точный студенческий шаблон</b> — личные данные, семья и достижения\n"
             "• 📸 <b>Фото 3x4</b> — загрузка прямо из галереи\n"
             "• 📄 <b>Word и PDF</b> — готовые государственные форматы\n"
             "• 🆓 <b>100% бесплатно</b>\n\n"
@@ -237,7 +232,7 @@ async def process_fio(message: types.Message, state: FSMContext):
     await state.set_state(ObyektivkaStates.position)
     await message.answer(T[lang]["position"], reply_markup=get_skip_kb(lang))
 
-# 2. Position
+# 2. Position (OTM, fakultet, yo'nalish, guruh va kurs)
 @dp.message(ObyektivkaStates.position)
 async def process_position(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -281,40 +276,10 @@ async def process_nationality(message: types.Message, state: FSMContext):
     lang = data["lang"]
     await state.update_data(nationality=message.text.strip())
     
-    await state.set_state(ObyektivkaStates.education)
-    await message.answer(T[lang]["education"], reply_markup=get_skip_kb(lang, extra_buttons=EDU[lang]))
-
-# 6. Education (Talaba uchun keraksiz maydonlarni avtomatik "yo'q" qilib ketamiz)
-@dp.message(ObyektivkaStates.education)
-async def process_education(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
-    await state.update_data(
-        education=val.strip(),
-        party="",
-        degree="",
-        title="",
-        military="",
-        awards="",
-        deputy=""
-    )
-    
-    await state.set_state(ObyektivkaStates.graduated)
-    await message.answer(T[lang]["graduated"], reply_markup=get_skip_kb(lang))
-
-# 7. Graduated
-@dp.message(ObyektivkaStates.graduated)
-async def process_graduated(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
-    await state.update_data(graduated=val.strip())
-    
     await state.set_state(ObyektivkaStates.specialty)
     await message.answer(T[lang]["specialty"], reply_markup=get_skip_kb(lang))
 
-# 8. Specialty
+# 6. Specialty (Ta'lim yo'nalishi)
 @dp.message(ObyektivkaStates.specialty)
 async def process_specialty(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -322,10 +287,32 @@ async def process_specialty(message: types.Message, state: FSMContext):
     val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
     await state.update_data(specialty=val.strip())
     
+    await state.set_state(ObyektivkaStates.graduated)
+    await message.answer(T[lang]["graduated"], reply_markup=get_skip_kb(lang))
+
+# 7. Graduated (Tamomlagan maktab/litseyi)
+@dp.message(ObyektivkaStates.graduated)
+async def process_graduated(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data["lang"]
+    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    await state.update_data(graduated=val.strip())
+    
+    await state.set_state(ObyektivkaStates.contact)
+    await message.answer(T[lang]["contact"], reply_markup=get_skip_kb(lang))
+
+# 8. Contact (Telefon nomeri)
+@dp.message(ObyektivkaStates.contact)
+async def process_contact(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data["lang"]
+    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    await state.update_data(contact=val.strip())
+    
     await state.set_state(ObyektivkaStates.languages)
     await message.answer(T[lang]["languages"], reply_markup=get_skip_kb(lang))
 
-# 9. Languages
+# 9. Languages (Chet tillari)
 @dp.message(ObyektivkaStates.languages)
 async def process_languages(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -333,10 +320,21 @@ async def process_languages(message: types.Message, state: FSMContext):
     val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
     await state.update_data(languages=val.strip())
     
+    await state.set_state(ObyektivkaStates.awards)
+    await message.answer(T[lang]["awards"], reply_markup=get_skip_kb(lang))
+
+# 10. Awards (Davlat mukofotlari)
+@dp.message(ObyektivkaStates.awards)
+async def process_awards(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data["lang"]
+    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    await state.update_data(awards=val.strip())
+    
     await state.set_state(ObyektivkaStates.photo)
     await message.answer(T[lang]["photo"], reply_markup=get_skip_kb(lang))
 
-# 10. Photo
+# 11. Photo
 @dp.message(ObyektivkaStates.photo, F.photo)
 async def process_photo(message: types.Message, state: FSMContext, bot: Bot):
     photo = message.photo[-1]
@@ -348,8 +346,9 @@ async def process_photo(message: types.Message, state: FSMContext, bot: Bot):
     data = await state.get_data()
     lang = data["lang"]
     
-    await state.set_state(ObyektivkaStates.work)
-    await message.answer(T[lang]["work"], reply_markup=get_skip_kb(lang))
+    await message.answer(T[lang]["rel_intro"])
+    await state.set_state(ObyektivkaStates.rel_kind)
+    await message.answer(T[lang]["rel_kind"], reply_markup=get_skip_kb(lang, extra_buttons=REL_KINDS[lang]))
 
 @dp.message(ObyektivkaStates.photo)
 async def process_photo_text(message: types.Message, state: FSMContext):
@@ -357,30 +356,20 @@ async def process_photo_text(message: types.Message, state: FSMContext):
     lang = data["lang"]
     if message.text == T[lang]["btn_skip"]:
         await state.update_data(photo_path=None)
-        await state.set_state(ObyektivkaStates.work)
-        await message.answer(T[lang]["work"], reply_markup=get_skip_kb(lang))
+        await message.answer(T[lang]["rel_intro"])
+        await state.set_state(ObyektivkaStates.rel_kind)
+        await message.answer(T[lang]["rel_kind"], reply_markup=get_skip_kb(lang, extra_buttons=REL_KINDS[lang]))
     else:
         await message.answer(T[lang]["photo_need"], reply_markup=get_skip_kb(lang))
 
-# 11. Work
-@dp.message(ObyektivkaStates.work)
-async def process_work(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
-    await state.update_data(work=val.strip())
-    
-    await message.answer(T[lang]["rel_intro"])
-    await state.set_state(ObyektivkaStates.rel_kind)
-    await message.answer(T[lang]["rel_kind"], reply_markup=get_skip_kb(lang, extra_buttons=REL_KINDS[lang]))
-
-# 12. Relatives
+# 12. Relatives (SHAXSIY MA'LUMOTLARI)
 @dp.message(ObyektivkaStates.rel_kind)
 async def process_rel_kind(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
     if message.text == T[lang]["btn_skip"]:
-        return await show_finish_menu(message, state)
+        await state.set_state(ObyektivkaStates.achievements)
+        return await message.answer(T[lang]["achievements"], reply_markup=get_skip_kb(lang))
         
     await state.update_data(cur_rel={"kind": message.text.strip()})
     await state.set_state(ObyektivkaStates.rel_fio)
@@ -409,19 +398,6 @@ async def process_rel_birth(message: types.Message, state: FSMContext):
     await state.update_data(cur_rel=cur)
     
     lang = data["lang"]
-    await state.set_state(ObyektivkaStates.rel_job)
-    await message.answer(T[lang]["rel_job"], reply_markup=ReplyKeyboardRemove())
-
-@dp.message(ObyektivkaStates.rel_job)
-async def process_rel_job(message: types.Message, state: FSMContext):
-    if not message.text:
-        return
-    data = await state.get_data()
-    cur = data.get("cur_rel", {})
-    cur["job"] = message.text.strip()
-    await state.update_data(cur_rel=cur)
-    
-    lang = data["lang"]
     await state.set_state(ObyektivkaStates.rel_address)
     await message.answer(T[lang]["rel_address"], reply_markup=ReplyKeyboardRemove())
 
@@ -432,6 +408,19 @@ async def process_rel_address(message: types.Message, state: FSMContext):
     data = await state.get_data()
     cur = data.get("cur_rel", {})
     cur["address"] = message.text.strip()
+    await state.update_data(cur_rel=cur)
+    
+    lang = data["lang"]
+    await state.set_state(ObyektivkaStates.rel_job)
+    await message.answer(T[lang]["rel_job"], reply_markup=ReplyKeyboardRemove())
+
+@dp.message(ObyektivkaStates.rel_job)
+async def process_rel_job(message: types.Message, state: FSMContext):
+    if not message.text:
+        return
+    data = await state.get_data()
+    cur = data.get("cur_rel", {})
+    cur["job"] = message.text.strip()
     
     relatives = data.get("relatives", [])
     relatives.append(cur)
@@ -451,9 +440,19 @@ async def process_rel_ask_more(message: types.Message, state: FSMContext):
         await state.set_state(ObyektivkaStates.rel_kind)
         await message.answer(T[lang]["rel_kind"], reply_markup=get_skip_kb(lang, extra_buttons=REL_KINDS[lang]))
     elif message.text == T[lang]["btn_done"]:
-        await show_finish_menu(message, state)
+        await state.set_state(ObyektivkaStates.achievements)
+        await message.answer(T[lang]["achievements"], reply_markup=get_skip_kb(lang))
     else:
         await message.answer(T[lang]["press_button"], reply_markup=get_rel_more_kb(lang))
+
+# 13. Achievements (ERISHGAN YUTUQLARI)
+@dp.message(ObyektivkaStates.achievements)
+async def process_achievements(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data["lang"]
+    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    await state.update_data(achievements=val.strip())
+    await show_finish_menu(message, state)
 
 # Istalgan boshqa matn yozilganda asosiy menyuni chiqarish
 @dp.message()
@@ -479,9 +478,10 @@ async def show_finish_menu(message: types.Message, state: FSMContext):
         f"👤 <b>{data.get('fio', '')}</b>\n"
         f"📅 {data.get('birth_date', '')}\n"
         f"📍 {data.get('birth_place', '')}\n"
-        f"🎓 {data.get('education', '')}\n"
+        f"📘 {data.get('specialty', '')}\n"
+        f"📞 {data.get('contact', '')}\n"
         f"{has_photo}\n"
-        f"👨‍👩‍👧 Qarindoshlar soni: {n_rel}\n\n"
+        f"👨‍👩‍👧 Oila a'zolari: {n_rel} ta\n\n"
         f"{T[lang]['choose_format']}"
     )
     

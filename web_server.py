@@ -52,7 +52,11 @@ class GenerateRequest(BaseModel):
     military: Optional[str] = ""
     awards: Optional[str] = ""
     deputy: Optional[str] = ""
+    marital_status: Optional[str] = ""
+    contact: Optional[str] = ""
+    address: Optional[str] = ""
     work: Optional[str] = ""
+    achievements: Optional[str] = ""
     photo_base64: Optional[str] = None
     relatives: List[RelativeItem] = []
     user_id: Optional[int] = None
@@ -101,7 +105,11 @@ async def generate_document(req: GenerateRequest):
         "military": req.military or "",
         "awards": req.awards or "",
         "deputy": req.deputy or "",
+        "marital_status": req.marital_status or "",
+        "contact": req.contact or "",
+        "address": req.address or "",
         "work": req.work or "",
+        "achievements": req.achievements or req.work or "",
         "photo_path": photo_path,
         "relatives": [r.dict() for r in req.relatives]
     }
