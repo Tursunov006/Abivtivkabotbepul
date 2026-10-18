@@ -883,16 +883,60 @@
       addRelativeRow({ kind: "ONASI" });
     });
 
+    function isValidFio(val) {
+      if (!val || /\d/.test(val) || /[@#$%^&*+=<>?/|~\\!;:\[\]{}]/.test(val)) return false;
+      const words = val.trim().split(/\s+/).filter(w => (w.match(/[A-Za-zА-Яа-яЁёЎўҚқҒғҲҳ]/g) || []).length >= 2);
+      return words.length >= 2;
+    }
+
+    function isValidBirth(val) {
+      return /\b(19[2-9]\d|20[0-2]\d)\b/.test(val || "");
+    }
+
+    function hasMinLetters(val, n = 3) {
+      return ((val || "").match(/[A-Za-zА-Яа-яЁёЎўҚқҒғҲҳ]/g) || []).length >= n;
+    }
+
     async function submitDoc(format) {
       const fio = document.getElementById('fio').value.trim();
-      if (!fio) {
-        alert("Iltimos, Familiya, ism va sharifingizni kiriting!");
+      if (!isValidFio(fio)) {
+        alert("⚠️ Xatolik: F.I.Sh. da raqamlar (masalan: 444) bo‘lishi mumkin emas va kamida Familiya hamda Ism (2 ta so‘z) yozilishi shart!");
         document.getElementById('fio').focus();
         return;
       }
 
+      const bDate = document.getElementById('birth_date').value.trim();
+      if (!isValidBirth(bDate)) {
+        alert("⚠️ Xatolik: Tug‘ilgan yili va sanasini to‘g‘ri kiriting (masalan: 14.07.2003 y)!");
+        document.getElementById('birth_date').focus();
+        return;
+      }
+
+      const bPlace = document.getElementById('birth_place').value.trim();
+      if (!hasMinLetters(bPlace, 4)) {
+        alert("⚠️ Xatolik: Tug‘ilgan joyingizni harflar bilan to‘liq kiriting!");
+        document.getElementById('birth_place').focus();
+        return;
+      }
+
+      const nat = document.getElementById('nationality').value.trim();
+      if (!hasMinLetters(nat, 3) || /\d/.test(nat)) {
+        alert("⚠️ Xatolik: Millatingizni raqamlarsiz, harflar bilan kiriting (masalan: O‘zbek)!");
+        document.getElementById('nationality').focus();
+        return;
+      }
+
+      const phone = document.getElementById('contact').value.trim();
+      if (phone && (/[A-Za-zА-Яа-яЁёЎўҚқҒғҲҳ]/.test(phone) || (phone.match(/\d/g) || []).length < 7)) {
+        alert("⚠️ Xatolik: Telefon raqamni to‘g‘ri kiriting (masalan: +998943987505)!");
+        document.getElementById('contact').focus();
+        return;
+      }
+
       const relatives = [];
-      document.querySelectorAll('#relativesList .relative-item').forEach(item => {
+      let relError = false;
+      document.querySelectorAll('#relativesList .relative-item').forEach((item, idx) => {
+        if (relError) return;
         const kind = item.querySelector('[name="rel_kind"]').value;
         const r_fio = item.querySelector('[name="rel_fio"]').value.trim();
         const r_birth = item.querySelector('[name="rel_birth"]').value.trim();
@@ -900,6 +944,12 @@
         const r_job = item.querySelector('[name="rel_job"]').value.trim();
 
         if (r_fio || r_birth || r_job || r_addr) {
+          if (!isValidFio(r_fio)) {
+            alert(`⚠️ #${idx + 1} oila a’zosining F.I.Sh. noto‘g‘ri kiritilgan (raqamlar mumkin emas, Familiya va Ism yozing)!`);
+            item.querySelector('[name="rel_fio"]').focus();
+            relError = true;
+            return;
+          }
           relatives.push({
             kind: kind,
             fio: r_fio,
@@ -909,6 +959,7 @@
           });
         }
       });
+      if (relError) return;
 
       const payload = {
         lang: currentLang,

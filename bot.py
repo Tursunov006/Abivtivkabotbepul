@@ -270,14 +270,74 @@ async def cb_choose_chat_tpl(call: types.CallbackQuery, state: FSMContext):
     await call.message.answer(T[lang]["fio"], reply_markup=ReplyKeyboardRemove())
     await call.answer()
 
+import re
+
+LETTER_RE = re.compile(r"[A-Za-zА-Яа-яЁёЎўҚқҒғҲҳ]")
+
+def is_valid_fio(text: str) -> bool:
+    t = text.strip()
+    if any(ch.isdigit() for ch in t):
+        return False
+    if re.search(r"[@#$%^&*+=<>?/|~\\!;:\[\]{}]", t):
+        return False
+    words = [w for w in t.split() if len(LETTER_RE.findall(w)) >= 2]
+    return len(words) >= 2 and len(LETTER_RE.findall(t)) >= 5
+
+def is_valid_birth(text: str) -> bool:
+    t = text.strip()
+    years = re.findall(r"\b(19[2-9]\d|20[0-2]\d)\b", t)
+    return len(years) >= 1
+
+def is_valid_text_min(text: str, min_letters: int = 3) -> bool:
+    return len(LETTER_RE.findall(text)) >= min_letters
+
+def is_valid_nationality(text: str) -> bool:
+    t = text.strip()
+    if any(ch.isdigit() for ch in t):
+        return False
+    return 3 <= len(LETTER_RE.findall(t)) <= 25
+
+def is_valid_phone(text: str) -> bool:
+    digits = re.findall(r"\d", text)
+    letters = LETTER_RE.findall(text)
+    return 7 <= len(digits) <= 15 and len(letters) == 0
+
+ERR_MSG = {
+    "lat": {
+        "fio": "⚠️ <b>Xato kiritildi!</b>\nIsm-sharifda raqamlar (masalan: <code>444</code>) bo‘lishi mumkin emas va kamida <b>Familiya hamda Ism</b> (2 ta so‘z) yozilishi shart.\n\n<i>Masalan: O‘rinov Rustamjon Akmaljon o‘g‘li</i>",
+        "birth": "⚠️ <b>Sana yoki yil xato kiritildi!</b>\nIltimos, tug‘ilgan sanangizni to‘g‘ri yozing (1920–2022 oralig‘idagi yil bo‘lishi shart).\n\n<i>Masalan: 14.07.2003 y</i>",
+        "place": "⚠️ <b>Manzil xato kiritildi!</b>\nFaqat raqam yozish mumkin emas. Viloyat va tuman/shaharni harflar bilan yozing.\n\n<i>Masalan: Farg‘ona viloyati Uchko‘prik tumani</i>",
+        "nat": "⚠️ <b>Millat xato kiritildi!</b>\nRaqamlarsiz, harflar bilan yozing (masalan: <i>O‘zbek, Qoraqalpoq, Tojik, Rus</i>).",
+        "phone": "⚠️ <b>Telefon raqami xato!</b>\nIltimos, haqiqiy telefon raqamingizni yozing yoki «O'tkazib yuborish» tugmasini bosing.\n\n<i>Masalan: +998943987505</i>",
+        "text": "⚠️ <b>Ma’lumot noto‘g‘ri kiritildi!</b>\nFaqat raqamlar (masalan: <code>444</code>) yozish mumkin emas, so‘z bilan to‘liqroq yozing yoki «O'tkazib yuborish» ni bosing.",
+    },
+    "cyr": {
+        "fio": "⚠️ <b>Хато киритилди!</b>\nИсм-шарифда рақамлар бўлиши мумкин эмас ва камида <b>Фамилия ҳамда Исм</b> (2 та сўз) ёзилиши шарт.\n\n<i>Масалан: Ўринов Рустамжон Акмалжон ўғли</i>",
+        "birth": "⚠️ <b>Сана ёки йил хато киритилди!</b>\nТуғилган санани тўғри ёзинг.\n\n<i>Масалан: 14.07.2003 й</i>",
+        "place": "⚠️ <b>Манзил хато киритилди!</b>\nВилоят ва туман/шаҳарни ҳарфлар билан ёзинг.",
+        "nat": "⚠️ <b>Миллат хато киритилди!</b>\nРақамларсиз, ҳарфлар билан ёзинг (масалан: <i>Ўзбек</i>).",
+        "phone": "⚠️ <b>Телефон рақами хато!</b>\nТўғри телефон рақам ёзинг (масалан: <i>+998943987505</i>).",
+        "text": "⚠️ <b>Маълумот нотўғри киритилди!</b>\nФақат рақам ёзиш мумкин эмас, сўз билан ёзинг.",
+    },
+    "ru": {
+        "fio": "⚠️ <b>Ошибка!</b>\nФ.И.О. не может содержать цифры и должно состоять минимум из 2 слов (Фамилия и Имя).\n\n<i>Например: Уринов Рустамжон Акмалжон угли</i>",
+        "birth": "⚠️ <b>Неверная дата рождения!</b>\nУкажите реальный год рождения (например: <i>14.07.2003 г.</i>).",
+        "place": "⚠️ <b>Неверный адрес!</b>\nВведите область и район буквами.",
+        "nat": "⚠️ <b>Неверная национальность!</b>\nВведите буквами без цифр (например: <i>Узбек</i>).",
+        "phone": "⚠️ <b>Неверный номер телефона!</b>\nВведите корректный номер (например: <i>+998943987505</i>).",
+        "text": "⚠️ <b>Некорректный ввод!</b>\nНельзя вводить только цифры, напишите текстом.",
+    }
+}
+
 # 1. FIO
 @dp.message(ObyektivkaStates.fio)
 async def process_fio(message: types.Message, state: FSMContext):
-    if not message.text:
+    data = await state.get_data()
+    lang = data.get("lang", "lat")
+    if not message.text or not is_valid_fio(message.text):
+        await message.answer(ERR_MSG[lang]["fio"])
         return
     await state.update_data(fio=message.text.strip())
-    data = await state.get_data()
-    lang = data["lang"]
     await state.set_state(ObyektivkaStates.position)
     await message.answer(T[lang]["position"], reply_markup=get_skip_kb(lang))
 
@@ -286,7 +346,12 @@ async def process_fio(message: types.Message, state: FSMContext):
 async def process_position(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    if not message.text:
+        return
+    if message.text != T[lang]["btn_skip"] and not is_valid_text_min(message.text, 4):
+        await message.answer(ERR_MSG[lang]["text"], reply_markup=get_skip_kb(lang))
+        return
+    val = "" if message.text == T[lang]["btn_skip"] else message.text
     await state.update_data(position=val.strip())
     
     await state.set_state(ObyektivkaStates.birth_date)
@@ -295,10 +360,11 @@ async def process_position(message: types.Message, state: FSMContext):
 # 3. Birth date
 @dp.message(ObyektivkaStates.birth_date)
 async def process_birth_date(message: types.Message, state: FSMContext):
-    if not message.text:
-        return
     data = await state.get_data()
     lang = data["lang"]
+    if not message.text or not is_valid_birth(message.text):
+        await message.answer(ERR_MSG[lang]["birth"])
+        return
     await state.update_data(birth_date=message.text.strip())
     
     await state.set_state(ObyektivkaStates.birth_place)
@@ -307,22 +373,34 @@ async def process_birth_date(message: types.Message, state: FSMContext):
 # 4. Birth place
 @dp.message(ObyektivkaStates.birth_place)
 async def process_birth_place(message: types.Message, state: FSMContext):
-    if not message.text:
-        return
     data = await state.get_data()
     lang = data["lang"]
+    if not message.text or not is_valid_text_min(message.text, 4):
+        await message.answer(ERR_MSG[lang]["place"])
+        return
     await state.update_data(birth_place=message.text.strip())
     
     await state.set_state(ObyektivkaStates.nationality)
-    await message.answer(T[lang]["nationality"], reply_markup=ReplyKeyboardRemove())
+    nat_Preset = {
+        "lat": ["O‘zbek", "Qoraqalpoq", "Tojik", "Qozoq", "Rus"],
+        "cyr": ["Ўзбек", "Қорақалпоқ", "Тожик", "Қозоқ", "Рус"],
+        "ru": ["Узбек", "Каракалпак", "Таджик", "Казах", "Русский"]
+    }.get(lang, ["O‘zbek"])
+    kb = [[KeyboardButton(text=nat_Preset[0]), KeyboardButton(text=nat_Preset[1])],
+          [KeyboardButton(text=nat_Preset[2]), KeyboardButton(text=nat_Preset[3]), KeyboardButton(text=nat_Preset[4])]]
+    await message.answer(
+        T[lang]["nationality"],
+        reply_markup=ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True, one_time_keyboard=True)
+    )
 
 # 5. Nationality
 @dp.message(ObyektivkaStates.nationality)
 async def process_nationality(message: types.Message, state: FSMContext):
-    if not message.text:
-        return
     data = await state.get_data()
     lang = data["lang"]
+    if not message.text or not is_valid_nationality(message.text):
+        await message.answer(ERR_MSG[lang]["nat"])
+        return
     await state.update_data(nationality=message.text.strip())
     
     await state.set_state(ObyektivkaStates.specialty)
@@ -333,7 +411,12 @@ async def process_nationality(message: types.Message, state: FSMContext):
 async def process_specialty(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    if not message.text:
+        return
+    if message.text != T[lang]["btn_skip"] and not is_valid_text_min(message.text, 3):
+        await message.answer(ERR_MSG[lang]["text"], reply_markup=get_skip_kb(lang))
+        return
+    val = "" if message.text == T[lang]["btn_skip"] else message.text
     await state.update_data(specialty=val.strip())
     
     await state.set_state(ObyektivkaStates.graduated)
@@ -344,7 +427,12 @@ async def process_specialty(message: types.Message, state: FSMContext):
 async def process_graduated(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    if not message.text:
+        return
+    if message.text != T[lang]["btn_skip"] and not is_valid_text_min(message.text, 3):
+        await message.answer(ERR_MSG[lang]["text"], reply_markup=get_skip_kb(lang))
+        return
+    val = "" if message.text == T[lang]["btn_skip"] else message.text
     await state.update_data(graduated=val.strip())
     
     await state.set_state(ObyektivkaStates.contact)
@@ -355,7 +443,12 @@ async def process_graduated(message: types.Message, state: FSMContext):
 async def process_contact(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    if not message.text:
+        return
+    if message.text != T[lang]["btn_skip"] and not is_valid_phone(message.text):
+        await message.answer(ERR_MSG[lang]["phone"], reply_markup=get_skip_kb(lang))
+        return
+    val = "" if message.text == T[lang]["btn_skip"] else message.text
     await state.update_data(contact=val.strip())
     
     await state.set_state(ObyektivkaStates.languages)
@@ -366,7 +459,12 @@ async def process_contact(message: types.Message, state: FSMContext):
 async def process_languages(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    if not message.text:
+        return
+    if message.text != T[lang]["btn_skip"] and not is_valid_text_min(message.text, 3):
+        await message.answer(ERR_MSG[lang]["text"], reply_markup=get_skip_kb(lang))
+        return
+    val = "" if message.text == T[lang]["btn_skip"] else message.text
     await state.update_data(languages=val.strip())
     
     await state.set_state(ObyektivkaStates.awards)
@@ -377,7 +475,12 @@ async def process_languages(message: types.Message, state: FSMContext):
 async def process_awards(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    if not message.text:
+        return
+    if message.text != T[lang]["btn_skip"] and not is_valid_text_min(message.text, 2):
+        await message.answer(ERR_MSG[lang]["text"], reply_markup=get_skip_kb(lang))
+        return
+    val = "" if message.text == T[lang]["btn_skip"] else message.text
     await state.update_data(awards=val.strip())
     
     await state.set_state(ObyektivkaStates.photo)
@@ -416,9 +519,14 @@ async def process_photo_text(message: types.Message, state: FSMContext):
 async def process_rel_kind(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
+    if not message.text:
+        return
     if message.text == T[lang]["btn_skip"]:
         await state.set_state(ObyektivkaStates.achievements)
         return await message.answer(T[lang]["achievements"], reply_markup=get_skip_kb(lang))
+    if not is_valid_text_min(message.text, 2) or any(ch.isdigit() for ch in message.text):
+        await message.answer(ERR_MSG[lang]["text"], reply_markup=get_skip_kb(lang, extra_buttons=REL_KINDS[lang]))
+        return
         
     await state.update_data(cur_rel={"kind": message.text.strip()})
     await state.set_state(ObyektivkaStates.rel_fio)
@@ -426,48 +534,53 @@ async def process_rel_kind(message: types.Message, state: FSMContext):
 
 @dp.message(ObyektivkaStates.rel_fio)
 async def process_rel_fio(message: types.Message, state: FSMContext):
-    if not message.text:
-        return
     data = await state.get_data()
+    lang = data["lang"]
+    if not message.text or not is_valid_fio(message.text):
+        await message.answer(ERR_MSG[lang]["fio"])
+        return
     cur = data.get("cur_rel", {})
     cur["fio"] = message.text.strip()
     await state.update_data(cur_rel=cur)
     
-    lang = data["lang"]
     await state.set_state(ObyektivkaStates.rel_birth)
     await message.answer(T[lang]["rel_birth"], reply_markup=ReplyKeyboardRemove())
 
 @dp.message(ObyektivkaStates.rel_birth)
 async def process_rel_birth(message: types.Message, state: FSMContext):
-    if not message.text:
-        return
     data = await state.get_data()
+    lang = data["lang"]
+    if not message.text or not is_valid_birth(message.text):
+        await message.answer(ERR_MSG[lang]["birth"])
+        return
     cur = data.get("cur_rel", {})
     cur["birth"] = message.text.strip()
     await state.update_data(cur_rel=cur)
     
-    lang = data["lang"]
     await state.set_state(ObyektivkaStates.rel_address)
     await message.answer(T[lang]["rel_address"], reply_markup=ReplyKeyboardRemove())
 
 @dp.message(ObyektivkaStates.rel_address)
 async def process_rel_address(message: types.Message, state: FSMContext):
-    if not message.text:
-        return
     data = await state.get_data()
+    lang = data["lang"]
+    if not message.text or not is_valid_text_min(message.text, 4):
+        await message.answer(ERR_MSG[lang]["place"])
+        return
     cur = data.get("cur_rel", {})
     cur["address"] = message.text.strip()
     await state.update_data(cur_rel=cur)
     
-    lang = data["lang"]
     await state.set_state(ObyektivkaStates.rel_job)
     await message.answer(T[lang]["rel_job"], reply_markup=ReplyKeyboardRemove())
 
 @dp.message(ObyektivkaStates.rel_job)
 async def process_rel_job(message: types.Message, state: FSMContext):
-    if not message.text:
-        return
     data = await state.get_data()
+    lang = data["lang"]
+    if not message.text or not is_valid_text_min(message.text, 3):
+        await message.answer(ERR_MSG[lang]["text"])
+        return
     cur = data.get("cur_rel", {})
     cur["job"] = message.text.strip()
     
@@ -475,7 +588,6 @@ async def process_rel_job(message: types.Message, state: FSMContext):
     relatives.append(cur)
     await state.update_data(relatives=relatives, cur_rel=None)
     
-    lang = data["lang"]
     msg_added = T[lang]["rel_added"].format(kind=cur["kind"], fio=cur["fio"], n=len(relatives))
     await state.set_state(ObyektivkaStates.rel_ask_more)
     await message.answer(msg_added, reply_markup=get_rel_more_kb(lang))
@@ -499,7 +611,12 @@ async def process_rel_ask_more(message: types.Message, state: FSMContext):
 async def process_achievements(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
-    val = "" if message.text == T[lang]["btn_skip"] else (message.text or "")
+    if not message.text:
+        return
+    if message.text != T[lang]["btn_skip"] and not is_valid_text_min(message.text, 4):
+        await message.answer(ERR_MSG[lang]["text"], reply_markup=get_skip_kb(lang))
+        return
+    val = "" if message.text == T[lang]["btn_skip"] else message.text
     await state.update_data(achievements=val.strip())
     await show_finish_menu(message, state)
 
