@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import base64
 import uuid
 from pathlib import Path
@@ -8,7 +9,6 @@ from pydantic import BaseModel
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
 
 from aiogram import Bot
 from aiogram.types import FSInputFile
@@ -20,12 +20,27 @@ from generator_pdf import generate_pdf
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
 
-app = FastAPI(title="Obyektivka Web App API")
+app = FastAPI(title="Universal Obyektivka Web App API")
 
 BASE_DIR = Path(__file__).parent
 STATIC_DIR = BASE_DIR / "static"
 TEMP_DIR = BASE_DIR / "temp_files"
 TEMP_DIR.mkdir(exist_ok=True)
+STATS_FILE = TEMP_DIR / "stats.json"
+
+
+def increment_stat(fmt: str, template_type: str):
+    try:
+        stats = {"total": 0, "pdf": 0, "docx": 0, "student": 0, "classic": 0}
+        if STATS_FILE.exists():
+            stats.update(json.loads(STATS_FILE.read_text(encoding="utf-8")))
+        stats["total"] = stats.get("total", 0) + 1
+        stats[fmt] = stats.get(fmt, 0) + 1
+        stats[template_type] = stats.get(template_type, 0) + 1
+        STATS_FILE.write_text(json.dumps(stats), encoding="utf-8")
+    except Exception:
+        pass
+
 
 class RelativeItem(BaseModel):
     kind: str = ""
@@ -34,9 +49,11 @@ class RelativeItem(BaseModel):
     job: str = ""
     address: str = ""
 
+
 class GenerateRequest(BaseModel):
     lang: str = "lat"
-    format: str = "docx" # "docx" yoki "pdf"
+    format: str = "docx"  # "docx" yoki "pdf"
+    template_type: Optional[str] = "student"  # "student" yoki "classic"
     fio: str
     position: Optional[str] = ""
     birth_date: Optional[str] = ""
@@ -62,20 +79,35 @@ class GenerateRequest(BaseModel):
     user_id: Optional[int] = None
     init_data: Optional[str] = ""
 
+
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
     index_file = STATIC_DIR / "index.html"
-    return HTMLResponse(content=index_file.read_text(encoding="utf-8"))
+    return HTMLResponse(
+        content=index_file.read_text(encoding="utf-8"),
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"}
+    )
+
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok", "service": "Abivtivkabot 24/7"}
+    return {"status": "ok", "service": "Abivtivkabot Universal 24/7"}
+
+
+@app.get("/api/stats")
+async def get_stats():
+    if STATS_FILE.exists():
+        try:
+            return json.loads(STATS_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"total": 0, "pdf": 0, "docx": 0, "student": 0, "classic": 0}
+
 
 @app.post("/api/generate")
 async def generate_document(req: GenerateRequest):
     req_id = str(uuid.uuid4())[:8]
-    
-    # 3x4 Rasmni saqlash (agar bo'lsa)
+
     photo_path = None
     if req.photo_base64 and "," in req.photo_base64:
         try:
@@ -88,8 +120,11 @@ async def generate_document(req: GenerateRequest):
             print(f"Photo save error: {e}")
             photo_path = None
 
+    tpl = req.template_type if req.template_type in ("student", "classic") else "student"
+
     data = {
         "lang": req.lang,
+        "template_type": tpl,
         "fio": req.fio,
         "position": req.position or "",
         "birth_date": req.birth_date or "",
@@ -109,7 +144,7 @@ async def generate_document(req: GenerateRequest):
         "contact": req.contact or "",
         "address": req.address or "",
         "work": req.work or "",
-        "achievements": req.achievements or req.work or "",
+        "achievements": req.achievements or "",
         "photo_path": photo_path,
         "relatives": [r.dict() for r in req.relatives]
     }
@@ -120,17 +155,24 @@ async def generate_document(req: GenerateRequest):
             generate_pdf(data, str(out_file))
             media_type = "application/pdf"
             filename = f"Obyektivka_{req.fio}.pdf"
+            increment_stat("pdf", tpl)
         else:
             out_file = TEMP_DIR / f"obyektivka_{req_id}.docx"
             generate_docx(data, str(out_file))
             media_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             filename = f"Obyektivka_{req.fio}.docx"
+            increment_stat("docx", tpl)
 
-        # Agar foydalanuvchi Telegram ID si bo'lsa, to'g'ridan-to'g'ri uning lichkasiga ham yuboramiz!
         if req.user_id and BOT_TOKEN:
             try:
                 bot = Bot(token=BOT_TOKEN)
-                caption = "✅ Obyektivkangiz tayyor!" if req.lang == "lat" else ("✅ Объективкангиз тайёр!" if req.lang == "cyr" else "✅ Ваша объективка готова!")
+                caption = (
+                    "✅ Obyektivkangiz tayyor! (@abivtivka_bot)"
+                    if req.lang == "lat" else (
+                        "✅ Объективкангиз тайёр! (@abivtivka_bot)"
+                        if req.lang == "cyr" else "✅ Ваша объективка готова! (@abivtivka_bot)"
+                    )
+                )
                 await bot.send_document(
                     chat_id=req.user_id,
                     document=FSInputFile(str(out_file), filename=filename),

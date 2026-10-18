@@ -6,6 +6,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
 from texts import DOC
+from translit import normalize_data_script
 
 
 def set_cell_margins(cell, top=40, bottom=40, left=40, right=40):
@@ -52,10 +53,12 @@ def set_table_borders(table, color="000000"):
     tblPr.append(tblBorders)
 
 
-def generate_docx(data: dict, output_path: str):
+def generate_docx(raw_data: dict, output_path: str):
+    data = normalize_data_script(raw_data)
     lang = data.get("lang", "lat")
     if lang not in DOC:
         lang = "lat"
+    template_type = data.get("template_type", "student")
     labels = DOC[lang]["labels"]
     none_text = DOC[lang]["none"]
 
@@ -74,7 +77,7 @@ def generate_docx(data: dict, output_path: str):
     normal_style.font.size = Pt(10.5)
     normal_style.font.color.rgb = RGBColor(0, 0, 0)
 
-    # 1. Yuqori blok: Chapda (MA'LUMOTNOMA, F.I.Sh., Universitet/fakultet), O'ngda 3x4 rasm
+    # 1. Yuqori blok: Chapda (MA'LUMOTNOMA, F.I.Sh., Lavozim/OTM), O'ngda 3x4 rasm
     top_table = doc.add_table(rows=1, cols=2)
     top_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     top_table.autofit = False
@@ -90,7 +93,6 @@ def generate_docx(data: dict, output_path: str):
     set_cell_margins(cell_info, top=0, bottom=0, left=0, right=60)
     set_cell_margins(cell_photo, top=0, bottom=0, left=0, right=0)
 
-    # MA'LUMOTNOMA
     p_title = cell_info.paragraphs[0]
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_title.paragraph_format.space_before = Pt(2)
@@ -99,16 +101,15 @@ def generate_docx(data: dict, output_path: str):
     r_title.bold = True
     r_title.font.size = Pt(12.5)
 
-    # F.I.Sh.
+    fio_text = data.get("fio", "").strip()
     p_fio = cell_info.add_paragraph()
     p_fio.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_fio.paragraph_format.space_before = Pt(0)
     p_fio.paragraph_format.space_after = Pt(8)
-    r_fio = p_fio.add_run(data.get("fio", "").strip())
+    r_fio = p_fio.add_run(fio_text)
     r_fio.bold = True
     r_fio.font.size = Pt(12.5)
 
-    # Universitet, fakultet, kurs
     pos_val = data.get("position", "").strip()
     if pos_val:
         p_pos = cell_info.add_paragraph()
@@ -136,7 +137,6 @@ def generate_docx(data: dict, output_path: str):
         set_cell_margins(cell_photo, top=280, bottom=280, left=40, right=40)
         p_photo.add_run("\n3x4\n")
 
-    # 2. Asosiy bandlar (Tug'ilgan yili, joyi, Millati, Ta'lim yo'nalishi, Tamomlagan, Telefon, Chet tillari)
     b_date = data.get("birth_date", "").strip() or none_text
     b_place = data.get("birth_place", "").strip() or none_text
     nat_val = data.get("nationality", "").strip() or none_text
@@ -146,6 +146,158 @@ def generate_docx(data: dict, output_path: str):
     lang_val = data.get("languages", "").strip() or none_text
     awards_val = data.get("awards", "").strip() or none_text
 
+    if template_type == "classic":
+        # ==================== KLASSIK (BARCHA XODIMLAR / DAVLAT XIZMATI) SHABLONI ====================
+        party_val = data.get("party", "").strip() or none_text
+        edu_val = data.get("education", "").strip() or none_text
+        deg_val = data.get("degree", "").strip() or none_text
+        title_val = data.get("title", "").strip() or none_text
+        mil_val = data.get("military", "").strip() or none_text
+        dep_val = data.get("deputy", "").strip() or none_text
+
+        pairs = [
+            ((labels["birth_date"], b_date), (labels["birth_place"], b_place)),
+            ((labels["nationality"], nat_val), (labels["party"], party_val)),
+            ((labels["education"], edu_val), (labels["graduated"], grad_val)),
+            ((labels["classic_specialty"], spec_val), (labels["degree"], deg_val)),
+            ((labels["title"], title_val), (labels["languages"], lang_val)),
+            ((labels["military"], mil_val), (labels["awards"], awards_val)),
+        ]
+
+        grid_tbl = doc.add_table(rows=0, cols=2)
+        grid_tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+        grid_tbl.autofit = False
+
+        for (l_lbl, l_val), (r_lbl, r_val) in pairs:
+            row = grid_tbl.add_row()
+            c0, c1 = row.cells[0], row.cells[1]
+            c0.width = Mm(85)
+            c1.width = Mm(90)
+            set_cell_borders(c0)
+            set_cell_borders(c1)
+            set_cell_margins(c0, top=35, bottom=35, left=0, right=80)
+            set_cell_margins(c1, top=35, bottom=35, left=0, right=0)
+
+            for cell, lbl, val in ((c0, l_lbl, l_val), (c1, r_lbl, r_val)):
+                p = cell.paragraphs[0]
+                p.paragraph_format.space_before = Pt(1)
+                p.paragraph_format.space_after = Pt(1)
+                rl = p.add_run(f"{lbl}\n")
+                rl.bold = True
+                rl.font.size = Pt(10)
+                rv = p.add_run(val)
+                rv.font.size = Pt(10)
+
+        p_dep = doc.add_paragraph()
+        p_dep.paragraph_format.space_before = Pt(4)
+        p_dep.paragraph_format.space_after = Pt(4)
+        rd1 = p_dep.add_run(f"{labels['deputy']}\n")
+        rd1.bold = True
+        rd1.font.size = Pt(10)
+        rd2 = p_dep.add_run(dep_val)
+        rd2.font.size = Pt(10)
+
+        if phone_val and phone_val != none_text:
+            p_ph = doc.add_paragraph()
+            p_ph.paragraph_format.space_before = Pt(2)
+            p_ph.paragraph_format.space_after = Pt(4)
+            rph1 = p_ph.add_run(f"{labels['contact']}: ")
+            rph1.bold = True
+            rph1.font.size = Pt(10)
+            rph2 = p_ph.add_run(phone_val)
+            rph2.font.size = Pt(10)
+
+        # MEHNAT FAOLIYATI
+        work_raw = (data.get("work", "") or "").strip()
+        if work_raw:
+            p_wt = doc.add_paragraph()
+            p_wt.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p_wt.paragraph_format.space_before = Pt(10)
+            p_wt.paragraph_format.space_after = Pt(6)
+            r_wt = p_wt.add_run(DOC[lang]["work_title"])
+            r_wt.bold = True
+            r_wt.font.size = Pt(11)
+
+            for wline in [l.strip() for l in work_raw.split("\n") if l.strip()]:
+                pw = doc.add_paragraph()
+                pw.paragraph_format.space_before = Pt(2)
+                pw.paragraph_format.space_after = Pt(3)
+                rw = pw.add_run(wline)
+                rw.font.size = Pt(10)
+
+        # Yutuqlar (agar kiritilgan bo'lsa)
+        ach_raw = (data.get("achievements", "") or "").strip()
+        if ach_raw and ach_raw != work_raw and ach_raw.lower() not in ["yo'q", "yo‘q", "йўқ", "нет", "-"]:
+            p_at = doc.add_paragraph()
+            p_at.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p_at.paragraph_format.space_before = Pt(10)
+            p_at.paragraph_format.space_after = Pt(6)
+            r_at = p_at.add_run(DOC[lang]["ach_title"])
+            r_at.bold = True
+            r_at.font.size = Pt(11)
+
+            for idx, line in enumerate([l.strip() for l in ach_raw.split("\n") if l.strip()], 1):
+                clean = line.lstrip("0123456789.) ").strip() or line
+                pi = doc.add_paragraph()
+                pi.paragraph_format.space_before = Pt(2)
+                pi.paragraph_format.space_after = Pt(3)
+                ri = pi.add_run(f"{idx}. {clean}")
+                ri.font.size = Pt(10)
+
+        # YAQIN QARINDOSHLARI HAQIDA MA'LUMOT
+        valid_relatives = [
+            r for r in data.get("relatives", [])
+            if r.get("fio") or r.get("job") or r.get("birth") or r.get("address")
+        ]
+        if valid_relatives:
+            p_rt = doc.add_paragraph()
+            p_rt.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p_rt.paragraph_format.space_before = Pt(10)
+            p_rt.paragraph_format.space_after = Pt(6)
+            r_rt = p_rt.add_run(DOC[lang]["classic_rel_title"].format(fio=fio_text))
+            r_rt.bold = True
+            r_rt.font.size = Pt(11)
+
+            rtable = doc.add_table(rows=1, cols=5)
+            rtable.alignment = WD_TABLE_ALIGNMENT.CENTER
+            rtable.autofit = False
+            set_table_borders(rtable, color="000000")
+
+            col_widths = [Mm(24), Mm(41), Mm(32), Mm(44), Mm(34)]
+            headers = DOC[lang]["classic_rel_headers"]
+            hdr_cells = rtable.rows[0].cells
+            for i, htext in enumerate(headers):
+                hdr_cells[i].width = col_widths[i]
+                p = hdr_cells[i].paragraphs[0]
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                r = p.add_run(htext)
+                r.bold = True
+                r.font.size = Pt(9.5)
+                set_cell_margins(hdr_cells[i], top=45, bottom=45, left=45, right=45)
+
+            for rel in valid_relatives:
+                row_cells = rtable.add_row().cells
+                row_vals = [
+                    (rel.get("kind", "") or "").strip(),
+                    (rel.get("fio", "") or "").strip(),
+                    (rel.get("birth", "") or "").strip(),
+                    (rel.get("job", "") or "").strip(),
+                    (rel.get("address", "") or "").strip(),
+                ]
+                for i, val in enumerate(row_vals):
+                    row_cells[i].width = col_widths[i]
+                    p = row_cells[i].paragraphs[0]
+                    p.alignment = WD_ALIGN_PARAGRAPH.LEFT if i in (0, 1) else WD_ALIGN_PARAGRAPH.CENTER
+                    r = p.add_run(val)
+                    r.font.size = Pt(9.5)
+                    if i == 0:
+                        r.bold = True
+                    set_cell_margins(row_cells[i], top=45, bottom=45, left=45, right=45)
+
+        doc.save(output_path)
+        return output_path
+
+    # ==================== TALABA NAMUNASI (O'RINOV RUSTAMJON SHAKLI) ====================
     fields_spec = [
         (labels["birth_date"], b_date),
         (labels["birth_place"], b_place),
@@ -168,7 +320,7 @@ def generate_docx(data: dict, output_path: str):
         c_lbl.width = Mm(68)
         c_val.width = Mm(107)
 
-        bottom_pad = 90 if idx == 4 else 35  # Tamomlagan dan keyin biroz bo'shliq
+        bottom_pad = 90 if idx == 4 else 35
         set_cell_margins(c_lbl, top=30, bottom=bottom_pad, left=0, right=40)
         set_cell_margins(c_val, top=30, bottom=bottom_pad, left=0, right=0)
         set_cell_borders(c_lbl)
@@ -187,7 +339,6 @@ def generate_docx(data: dict, output_path: str):
         r2 = p2.add_run(val)
         r2.font.size = Pt(10.2)
 
-    # Davlat mukofotlari qatori
     p_aw = doc.add_paragraph()
     p_aw.paragraph_format.space_before = Pt(3)
     p_aw.paragraph_format.space_after = Pt(8)
@@ -197,10 +348,8 @@ def generate_docx(data: dict, output_path: str):
     r_aw_val = p_aw.add_run(awards_val)
     r_aw_val.font.size = Pt(10.2)
 
-    # 3. SHAXSIY MA'LUMOTLARI (Oila a'zolari jadvali - sarlavha qatorisiz)
-    relatives = data.get("relatives", [])
     valid_relatives = [
-        r for r in relatives
+        r for r in data.get("relatives", [])
         if r.get("fio") or r.get("job") or r.get("birth") or r.get("address")
     ]
 
@@ -241,7 +390,6 @@ def generate_docx(data: dict, output_path: str):
                     r.bold = True
                 set_cell_margins(row_cells[i], top=45, bottom=55, left=55, right=55)
 
-    # 4. ERISHGAN YUTUQLARI
     ach_raw = (data.get("achievements", "") or data.get("work", "")).strip()
     if ach_raw and ach_raw.lower() not in ["yo'q", "yo‘q", "йўқ", "нет", "-"]:
         p_at = doc.add_paragraph()

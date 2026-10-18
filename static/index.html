@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Talaba Obyektivkasi (Ma’lumotnoma)</title>
+  <title>Universal Obyektivka — Barcha uchun</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -17,14 +17,13 @@
       --border: #e2e8f0;
       --danger: #ef4444;
       --success: #10b981;
-      --shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -33,73 +32,42 @@
       color: var(--text);
       padding: 12px;
       padding-bottom: 105px;
-      line-height: 1.4;
     }
 
-    /* ZAMONAVIY HERO HEADER */
-    .hero {
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 14px;
-      padding: 18px 16px;
+    .header {
+      text-align: center;
+      margin-bottom: 12px;
+      padding: 16px 12px;
       background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%);
       color: white;
-      border-radius: 18px;
-      box-shadow: 0 8px 25px rgba(37, 99, 235, 0.25);
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(30, 58, 138, 0.22);
     }
 
-    .hero-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .hero-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .hero-icon {
-      width: 42px;
-      height: 42px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(8px);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-    }
-
-    .hero h1 {
-      font-size: 18px;
+    .header h1 {
+      font-size: 18.5px;
       font-weight: 800;
-      letter-spacing: -0.3px;
+      margin-bottom: 4px;
     }
 
-    .hero p {
+    .header p {
       font-size: 11.5px;
-      opacity: 0.85;
+      opacity: 0.9;
     }
 
-    .lang-bar {
+    .lang-switcher {
       display: flex;
-      background: rgba(255, 255, 255, 0.12);
-      padding: 3px;
-      border-radius: 12px;
-      gap: 4px;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
     }
 
     .lang-btn {
-      flex: 1;
-      padding: 6px 10px;
-      border: none;
-      background: transparent;
-      color: rgba(255, 255, 255, 0.85);
-      border-radius: 9px;
+      padding: 5px 12px;
+      border: 1px solid rgba(255,255,255,0.28);
+      background: rgba(255,255,255,0.12);
+      color: white;
+      border-radius: 99px;
       font-size: 11.5px;
       cursor: pointer;
       font-weight: 600;
@@ -107,146 +75,122 @@
     }
 
     .lang-btn.active {
-      background: #ffffff;
-      color: #0f172a;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    }
-
-    /* AQLLI KIRITISH (SMART PASTE) */
-    .smart-box {
-      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-      border: 1px solid #fde68a;
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .smart-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .smart-badge {
-      font-size: 12.5px;
+      background: white;
+      color: #1e3a8a;
       font-weight: 700;
-      color: #92400e;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      border-color: white;
     }
 
-    .demo-btn {
-      background: #ffffff;
-      color: #b45309;
-      border: 1px solid #fcd34d;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .smart-textarea {
-      width: 100%;
-      height: 55px;
-      padding: 8px 10px;
-      border: 1px solid #fcd34d;
-      border-radius: 10px;
-      font-size: 12px;
-      color: #451a03;
-      background: rgba(255, 255, 255, 0.9);
-      resize: none;
-      margin-bottom: 8px;
-    }
-
-    .smart-action-btn {
-      width: 100%;
-      background: #d97706;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-size: 12.5px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    /* ASOSIY KARTALAR */
-    .card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 14px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #f1f5f9;
-    }
-
-    .card-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #0f172a;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .clear-btn {
-      background: #fee2e2;
-      color: #dc2626;
-      border: none;
-      padding: 4px 9px;
-      border-radius: 6px;
-      font-size: 10.5px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .field {
-      margin-bottom: 12px;
-    }
-
-    .field:last-child {
-      margin-bottom: 0;
-    }
-
-    .field-row {
+    /* SHABLON TANLASH (Talaba vs Barcha/Xodim) */
+    .mode-selector {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
+      background: #e2e8f0;
+      padding: 5px;
+      border-radius: 13px;
+      margin-bottom: 10px;
+    }
+
+    .mode-btn {
+      border: none;
+      background: transparent;
+      padding: 10px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .mode-btn span.sub {
+      font-size: 10px;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    .mode-btn.active {
+      background: #ffffff;
+      color: #1e3a8a;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
       margin-bottom: 12px;
+    }
+
+    .btn-sample {
+      flex: 1;
+      padding: 9px 10px;
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      border-radius: 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-clear {
+      padding: 9px 12px;
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .section-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+    }
+
+    .section-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 7px;
+    }
+
+    .form-group {
+      margin-bottom: 11px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
     }
 
     label {
       display: block;
       font-size: 11.5px;
-      font-weight: 600;
+      font-weight: 700;
       color: #334155;
       margin-bottom: 4px;
     }
 
     input[type="text"], textarea, select {
       width: 100%;
-      padding: 10px 12px;
+      padding: 9px 11px;
       border: 1.5px solid var(--border);
-      border-radius: 10px;
+      border-radius: 9px;
       font-size: 13px;
       color: var(--text);
       background: #f8fafc;
@@ -256,105 +200,95 @@
     input[type="text"]:focus, textarea:focus, select:focus {
       outline: none;
       border-color: var(--primary);
-      background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
     }
 
-    /* TEZKOR TUGMACHALAR (CHIPS) */
+    textarea {
+      resize: vertical;
+      line-height: 1.4;
+    }
+
     .chips {
       display: flex;
       flex-wrap: wrap;
       gap: 5px;
-      margin-top: 6px;
+      margin-top: 5px;
     }
 
     .chip {
-      background: #f1f5f9;
-      color: #475569;
-      border: 1px solid #e2e8f0;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
       padding: 3px 9px;
-      border-radius: 14px;
+      border-radius: 99px;
       font-size: 10.5px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s;
     }
 
-    .chip:active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    /* 3x4 RASM BLOKI */
-    .photo-card {
+    /* 3x4 Rasm */
+    .photo-upload-box {
       display: flex;
       align-items: center;
       gap: 14px;
       background: #f8fafc;
       padding: 10px;
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px dashed #cbd5e1;
     }
 
-    .photo-box {
-      width: 62px;
-      height: 82px;
+    .photo-preview {
+      width: 63px;
+      height: 84px;
       border: 1.5px solid #4A6984;
       border-radius: 4px;
-      background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      flex-shrink: 0;
+      background: #fff;
+      color: var(--text-muted);
       font-size: 11px;
       font-weight: 700;
-      color: #94a3b8;
+      flex-shrink: 0;
     }
 
-    .photo-box img {
+    .photo-preview img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    .photo-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .btn-upload {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
+    .photo-input-label {
+      display: inline-block;
+      padding: 7px 13px;
       background: var(--primary);
       color: white;
       border-radius: 8px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      width: fit-content;
     }
 
-    .hint {
-      font-size: 10.5px;
-      color: var(--text-muted);
-    }
-
-    /* QARINDOSHLAR */
-    .rel-card {
+    .relative-item {
       background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 11px;
       margin-bottom: 10px;
       position: relative;
     }
 
-    .rel-del {
+    .rel-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .remove-rel-btn {
       position: absolute;
       top: 8px;
       right: 8px;
@@ -362,17 +296,16 @@
       color: var(--danger);
       border: none;
       border-radius: 6px;
-      width: 24px;
-      height: 24px;
-      font-size: 12px;
+      padding: 3px 8px;
+      font-size: 11px;
       cursor: pointer;
-      font-weight: bold;
+      font-weight: 700;
     }
 
-    .btn-add {
+    .btn-add-rel {
       width: 100%;
       padding: 10px;
-      background: var(--primary-light);
+      background: #eff6ff;
       border: 1.5px dashed var(--primary);
       color: var(--primary);
       border-radius: 10px;
@@ -381,74 +314,64 @@
       cursor: pointer;
     }
 
-    /* PASTKI FIXED BAR */
-    .footer-bar {
+    .bottom-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
       padding: 10px 14px;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom));
       display: flex;
       gap: 10px;
       border-top: 1px solid var(--border);
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 -4px 16px rgba(15,23,42,0.08);
       z-index: 100;
     }
 
-    .dl-btn {
+    .action-btn {
       flex: 1;
       padding: 13px;
-      border-radius: 12px;
+      border-radius: 11px;
       font-size: 13.5px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
+      gap: 6px;
       color: white;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-      transition: transform 0.1s;
     }
 
-    .dl-btn:active {
-      transform: scale(0.97);
+    .btn-docx {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
     }
 
-    .dl-docx {
-      background: linear-gradient(135deg, #0284c7, #2563eb);
+    .btn-pdf {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
     }
 
-    .dl-pdf {
-      background: linear-gradient(135deg, #e11d48, #dc2626);
-    }
-
-    /* LOADING OVERLAY */
-    .loader {
+    .loading-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(4px);
-      z-index: 300;
+      background: rgba(255,255,255,0.92);
+      z-index: 200;
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      gap: 12px;
-      color: white;
+      gap: 10px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
+      color: var(--primary);
     }
 
     .spinner {
-      width: 38px;
-      height: 38px;
-      border: 3.5px solid rgba(255, 255, 255, 0.25);
-      border-top-color: #ffffff;
+      width: 36px;
+      height: 36px;
+      border: 3.5px solid #e2e8f0;
+      border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 0.75s linear infinite;
     }
@@ -460,464 +383,492 @@
 </head>
 <body>
 
-  <div class="loader" id="loadingOverlay">
+  <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
     <span id="loadingText">Obyektivka tayyorlanmoqda...</span>
   </div>
 
-  <!-- HERO HEADER -->
-  <div class="hero">
-    <div class="hero-top">
-      <div class="hero-brand">
-        <div class="hero-icon">🎓</div>
-        <div>
-          <h1 id="appTitle">MA’LUMOTNOMA</h1>
-          <p id="appSub">Talabalar uchun rasmiy obyektivka platformasi</p>
-        </div>
-      </div>
-    </div>
-    <div class="lang-bar">
-      <button class="lang-btn active" onclick="setLang('lat')">🇺🇿 O'zbekcha</button>
-      <button class="lang-btn" onclick="setLang('cyr')">🇺🇿 Ўзбекча</button>
+  <div class="header">
+    <h1 id="hdrTitle">📋 Universal Obyektivka (Ma’lumotnoma)</h1>
+    <p id="hdrSub">Talabalar, o‘qituvchilar va davlat xizmatchilari uchun (PDF / Word)</p>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('lat')">🇺🇿 Lotin</button>
+      <button class="lang-btn" onclick="setLang('cyr')">🇺🇿 Кирилл (Avto-o‘girish)</button>
       <button class="lang-btn" onclick="setLang('ru')">🇷🇺 Русский</button>
     </div>
   </div>
 
-  <!-- AQLLI TEZKOR KIRITISH -->
-  <div class="smart-box">
-    <div class="smart-header">
-      <div class="smart-badge">⚡️ <span id="lblSmartTitle">1-bosishda tayyor namuna</span></div>
-      <button type="button" class="demo-btn" onclick="fillRustamjonSample()" id="btnDemo">🎯 Namuna to‘ldirish (O‘rinov Rustamjon)</button>
-    </div>
-    <textarea class="smart-textarea" id="smartInput" placeholder="Yoki o'zingiz haqingizda yozing: O‘rinov Rustamjon Akmaljon o‘g‘li 14.07.2003 Farg‘ona viloyati Uchko‘prik tumani"></textarea>
-    <button type="button" class="smart-action-btn" onclick="parseSmartText()">
-      ✨ <span id="btnSmartParse">Matndan avtomatik to‘ldirish</span>
+  <!-- 2 XIL SHABLON TANLASH -->
+  <div class="mode-selector">
+    <button type="button" class="mode-btn active" id="modeStudentBtn" onclick="setTemplateMode('student')">
+      <span>🎓 Talabalar uchun</span>
+      <span class="sub">OTM, Dekanat, Yutuqlar bilan</span>
+    </button>
+    <button type="button" class="mode-btn" id="modeClassicBtn" onclick="setTemplateMode('classic')">
+      <span>🏛 Barcha / Ish uchun</span>
+      <span class="sub">Klassik 3.5-shakl (Mehnat faoliyati)</span>
     </button>
   </div>
 
-  <form id="obyektivkaForm" oninput="saveDraft()" onsubmit="return false;">
+  <div class="top-actions">
+    <button type="button" class="btn-sample" id="btnSample" onclick="fillSample()">🎯 Namuna to‘ldirish</button>
+    <button type="button" class="btn-clear" onclick="clearForm()">🗑 Tozalash</button>
+  </div>
 
-    <!-- 1. TALABA ASOSIY MA'LUMOTLARI -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">👤 <span id="lblSecPersonal">Talaba ma’lumotlari</span></div>
-        <button type="button" class="clear-btn" onclick="clearForm()">🗑 Tozalash</button>
+  <form id="obyektivkaForm" onsubmit="return false;">
+
+    <!-- 1. Asosiy ma'lumotlar -->
+    <div class="section-card">
+      <div class="section-title">
+        <span id="sec1Title">👤 1. Asosiy ma’lumotlar</span>
       </div>
 
-      <div class="field">
+      <div class="form-group">
+        <label id="lblPhoto">3x4 Rasm (avtomatik 3x4 kesiladi)</label>
+        <div class="photo-upload-box">
+          <div class="photo-preview" id="photoPreview">3x4</div>
+          <div>
+            <label class="photo-input-label" for="photoInput">📷 Galereyadan tanlash</label>
+            <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+            <div style="font-size:10.5px; color:#64748b; margin-top:4px;">Istalgan rasmni tanlang — dastur o‘zi 3x4 qilib tekislaydi</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label id="lblFio">Familiya, ism va otasining ismi *</label>
         <input type="text" id="fio" required placeholder="Masalan: O‘rinov Rustamjon Akmaljon o‘g‘li">
       </div>
 
-      <div class="field">
+      <div class="form-group">
         <label id="lblPosition">Universitet, fakultet, yo‘nalish, guruh va kurs *</label>
-        <textarea id="position" rows="3" placeholder="Axborot texnologiyalari va menejment universiteti,&#10;Ijtimoiy fanlar fakulteti Filologiya va tillarni o‘qitish (arab tili) ta’lim yo‘nalishi Ar-125-24-guruh, 1-kurs talabasi"></textarea>
+        <textarea id="position" rows="3" placeholder="Masalan: Axborot texnologiyalari va menejment universiteti,&#10;Ijtimoiy fanlar fakulteti Filologiya va tillarni o‘qitish (arab tili) ta’lim yo‘nalishi Ar-125-24-guruh, 1-kurs talabasi"></textarea>
       </div>
 
-      <div class="field-row">
-        <div>
-          <label id="lblBirthDate">Tug‘ilgan yili *</label>
-          <input type="text" id="birth_date" required placeholder="14.07.2003 y">
-        </div>
-        <div>
-          <label id="lblNationality">Millati *</label>
-          <input type="text" id="nationality" required value="O‘zbek">
-        </div>
+      <div class="form-group">
+        <label id="lblBirthDate">Tug‘ilgan yili va sanasi *</label>
+        <input type="text" id="birth_date" placeholder="Masalan: 14.07.2003 y">
       </div>
 
-      <div class="field">
+      <div class="form-group">
         <label id="lblBirthPlace">Tug‘ilgan joyi *</label>
-        <input type="text" id="birth_place" required placeholder="Masalan: Farg‘ona viloyati Uchko‘prik tumani">
+        <input type="text" id="birth_place" placeholder="Masalan: Farg‘ona viloyati Uchko‘prik tumani">
+      </div>
+
+      <div class="form-group">
+        <label id="lblNationality">Millati *</label>
+        <input type="text" id="nationality" value="O‘zbek">
         <div class="chips">
-          <span class="chip" onclick="setVal('birth_place', 'Farg‘ona viloyati ')">Farg‘ona</span>
-          <span class="chip" onclick="setVal('birth_place', 'Qashqadaryo viloyati ')">Qashqadaryo</span>
-          <span class="chip" onclick="setVal('birth_place', 'Toshkent shahri')">Toshkent sh.</span>
-          <span class="chip" onclick="setVal('birth_place', 'Samarqand viloyati ')">Samarqand</span>
-          <span class="chip" onclick="setVal('birth_place', 'Andijon viloyati ')">Andijon</span>
+          <span class="chip" onclick="setVal('nationality','O‘zbek')">O‘zbek</span>
+          <span class="chip" onclick="setVal('nationality','Qoraqalpoq')">Qoraqalpoq</span>
+          <span class="chip" onclick="setVal('nationality','Tojik')">Tojik</span>
+          <span class="chip" onclick="setVal('nationality','Qozoq')">Qozoq</span>
+          <span class="chip" onclick="setVal('nationality','Rus')">Rus</span>
         </div>
       </div>
 
-      <div class="field">
-        <label id="lblSpecialty">Ta’lim yo‘nalishi *</label>
+      <div class="form-group">
+        <label id="lblSpecialty">Ta’lim yo‘nalishi / Mutaxassisligi</label>
         <input type="text" id="specialty" placeholder="Masalan: Filologiya va tillarni o‘qitish (arab tili)">
       </div>
 
-      <div class="field">
-        <label id="lblGraduated">Tamomlagan (yil va maktab/litsey) *</label>
+      <div class="form-group">
+        <label id="lblGraduated">Tamomlagan (maktab, litsey yoki OTM nomi va yili)</label>
         <input type="text" id="graduated" placeholder="Masalan: 2021-yil Uchko‘prik t. 5-umumiy o‘rta ta’lim maktabi">
       </div>
 
-      <div class="field">
-        <label id="lblContact">Telefon nomeri *</label>
+      <div class="form-group">
+        <label id="lblContact">Telefon nomeri</label>
         <input type="text" id="contact" placeholder="Masalan: +998943987505">
       </div>
 
-      <div class="field">
+      <div class="form-group">
         <label id="lblLanguages">Qaysi chet tillarini biladi</label>
         <input type="text" id="languages" placeholder="Masalan: Arab tili (sertifikat At Tanal B1)">
         <div class="chips">
-          <span class="chip" onclick="setVal('languages', 'Ingliz tili (IELTS 6.0)')">Ingliz tili (IELTS)</span>
-          <span class="chip" onclick="setVal('languages', 'Rus, ingliz tillari')">Rus, ingliz</span>
-          <span class="chip" onclick="setVal('languages', 'Arab tili (sertifikat B1)')">Arab tili (B1)</span>
-          <span class="chip" onclick="setVal('languages', 'yo‘q')">yo‘q</span>
+          <span class="chip" onclick="setVal('languages','Rus va ingliz tillari')">Rus, ingliz</span>
+          <span class="chip" onclick="setVal('languages','Ingliz tili (IELTS 6.5)')">IELTS 6.5</span>
+          <span class="chip" onclick="setVal('languages','Ingliz tili (CEFR B2)')">CEFR B2</span>
+          <span class="chip" onclick="setVal('languages','Rus tili')">Rus tili</span>
         </div>
       </div>
 
-      <div class="field">
+      <div class="form-group">
         <label id="lblAwards">Davlat mukofotlari bilan taqdirlanganmi (qanaqa)</label>
-        <input type="text" id="awards" value="yo‘q" placeholder="yo‘q">
+        <input type="text" id="awards" value="yo‘q">
       </div>
 
-      <div class="field">
-        <label id="lblPhoto">3x4 Rasm</label>
-        <div class="photo-card">
-          <div class="photo-box" id="photoPreview">3x4</div>
-          <div class="photo-actions">
-            <label class="btn-upload" for="photoInput" id="btnChoosePhoto">📷 Rasm tanlash</label>
-            <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
-            <span class="hint" id="photoHint">O'ng tepa burchakka rasmiy ramkada joylashadi</span>
+      <!-- Klassik shablon uchun qo'shimcha rasmiy bandlar -->
+      <div id="classicFieldsBox" style="display:none; border-top:1px dashed #cbd5e1; padding-top:11px; margin-top:11px;">
+        <div class="form-group">
+          <label>Ma’lumoti</label>
+          <input type="text" id="education" value="Oliy">
+          <div class="chips">
+            <span class="chip" onclick="setVal('education','Oliy')">Oliy</span>
+            <span class="chip" onclick="setVal('education','Tugallanmagan oliy')">Tugallanmagan oliy</span>
+            <span class="chip" onclick="setVal('education','O‘rta maxsus')">O‘rta maxsus</span>
+            <span class="chip" onclick="setVal('education','O‘rta')">O‘rta</span>
           </div>
         </div>
+        <div class="form-group">
+          <label>Partiyaviyligi</label>
+          <input type="text" id="party" value="yo‘q">
+          <div class="chips">
+            <span class="chip" onclick="setVal('party','yo‘q')">yo‘q</span>
+            <span class="chip" onclick="setVal('party','O‘zLiDeP a’zosi')">O‘zLiDeP</span>
+            <span class="chip" onclick="setVal('party','«Milliy tiklanish» DP a’zosi')">Milliy tiklanish</span>
+            <span class="chip" onclick="setVal('party','XDP a’zosi')">XDP</span>
+            <span class="chip" onclick="setVal('party','«Adolat» SDP a’zosi')">Adolat SDP</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Ilmiy darajasi</label>
+          <input type="text" id="degree" value="yo‘q">
+        </div>
+        <div class="form-group">
+          <label>Ilmiy unvoni</label>
+          <input type="text" id="title" value="yo‘q">
+        </div>
+        <div class="form-group">
+          <label>Harbiy (maxsus) unvoni</label>
+          <input type="text" id="military" value="yo‘q">
+        </div>
+        <div class="form-group">
+          <label>Deputatligi</label>
+          <input type="text" id="deputy" value="yo‘q">
+        </div>
+        <div class="form-group">
+          <label>💼 MEHNAT FAOLIYATI (har bir ish/o‘qish joyini yangi qatordan yozing)</label>
+          <textarea id="work" rows="4" placeholder="2015-2019 yy. - Farg‘ona davlat universiteti talabasi&#10;2019-2022 yy. - Uchko‘prik tumani 5-maktab o‘qituvchisi&#10;2022 y. - h.v. - Uchko‘prik tumani 5-maktab direktor o‘rinbosari"></textarea>
+        </div>
       </div>
     </div>
 
-    <!-- 2. SHAXSIY MA'LUMOTLARI (OILA A'ZOLARI JADVALI) -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">👨‍👩‍👧 <span id="lblSecRel">SHAXSIY MA’LUMOTLARI</span></div>
+    <!-- 2. Oila a'zolari / Yaqin qarindoshlari -->
+    <div class="section-card">
+      <div class="section-title">
+        <span id="sec2Title">👨‍👩‍👧 2. SHAXSIY MA’LUMOTLARI (Oila a’zolari)</span>
       </div>
-      <p class="hint" style="margin-bottom: 10px;" id="lblRelHint">Otasi, onasi, akasi, ukasi, opasi, singlisi (Jadval ustunlari: Qarindoshligi | F.I.Sh | Tug'ilgan sanasi | Manzili | Kasbi/ish joyi)</p>
-
       <div id="relativesList"></div>
-
-      <button type="button" class="btn-add" onclick="addRelativeRow()" id="btnAddRel">+ Oila a’zosini qo‘shish</button>
+      <button type="button" class="btn-add-rel" onclick="addRelativeRow()">➕ Oila a’zosini qo‘shish</button>
     </div>
 
-    <!-- 3. ERISHGAN YUTUQLARI -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">🏆 <span id="lblSecAch">ERISHGAN YUTUQLARI</span></div>
+    <!-- 3. Erishgan yutuqlari -->
+    <div class="section-card">
+      <div class="section-title">
+        <span id="sec3Title">🏆 3. ERISHGAN YUTUQLARI</span>
       </div>
-      <div class="field">
-        <label id="lblAchHint">Har bir yutuqni yangi qatordan yozing (avtomatik 1., 2., 3. raqamlanadi):</label>
-        <textarea id="achievements" rows="5" placeholder="25 noyabr 2024 yilda Universitetda bo‘lib o‘tgan “Ma’rifat Ulashib” loyihasi doirasida zakovat musobaqasida 2-o‘rinni qo‘lga kiritgani uchun Tashakkurnoma bilan taqdirlangan.&#10;30-yanvar 2025 yilda S.Nasafiy Kutubxonasida bo‘lib o‘tgan tadbirda faol ishtiroki uchun TASHAKKURNOMA bilan taqdirlangan.&#10;10 fevral 2025 yilda Matematika fanidan onlayn olimpiadada sertifikat bilan taqdirlangan"></textarea>
+      <div class="form-group">
+        <label id="lblAch">Har bir yutuqni yangi qatordan yozing (1., 2., 3. raqamlarni dastur o‘zi qo‘yadi)</label>
+        <textarea id="achievements" rows="4" placeholder="Masalan:&#10;25 noyabr 2024 yilda Universitetda bo‘lib o‘tgan “Ma’rifat Ulashib” loyihasi doirasida zakovat musobaqasida 2-o‘rinni qo‘lga kiritgani uchun Tashakkurnoma bilan taqdirlangan.&#10;10 fevral 2025 yilda Matematika fanidan onlayn olimpiadada sertifikat bilan taqdirlangan."></textarea>
       </div>
     </div>
 
   </form>
 
-  <!-- PASTKI YUKLAB OLISH TUGMALARI -->
-  <div class="footer-bar">
-    <button type="button" class="dl-btn dl-docx" onclick="submitDoc('docx')">
-      📝 <span id="btnDocxText">Word (.docx)</span>
+  <div class="bottom-bar">
+    <button type="button" class="action-btn btn-docx" onclick="submitDoc('docx')">
+      📝 Word (.docx)
     </button>
-    <button type="button" class="dl-btn dl-pdf" onclick="submitDoc('pdf')">
-      📄 <span id="btnPdfText">PDF (.pdf)</span>
+    <button type="button" class="action-btn btn-pdf" onclick="submitDoc('pdf')">
+      📄 PDF (.pdf)
     </button>
   </div>
 
   <script>
     let currentLang = 'lat';
+    let currentTemplate = 'student';
     let base64Photo = null;
-    let tg = window.Telegram?.WebApp;
+    const tg = window.Telegram?.WebApp;
 
     if (tg) {
-      tg.ready();
       tg.expand();
+      tg.enableClosingConfirmation();
     }
 
-    const UI_TEXT = {
-      lat: {
-        appTitle: "MA’LUMOTNOMA",
-        appSub: "Talabalar uchun rasmiy obyektivka platformasi",
-        lblSmartTitle: "1-bosishda tayyor namuna",
-        btnDemo: "🎯 Namuna to‘ldirish (O‘rinov Rustamjon)",
-        btnSmartParse: "Matndan avtomatik to‘ldirish",
-        lblSecPersonal: "Talaba ma’lumotlari",
-        lblFio: "Familiya, ism va otasining ismi *",
-        lblPosition: "Universitet, fakultet, yo‘nalish, guruh va kurs *",
-        lblBirthDate: "Tug‘ilgan yili *",
-        lblBirthPlace: "Tug‘ilgan joyi *",
-        lblNationality: "Millati *",
-        lblSpecialty: "Ta’lim yo‘nalishi *",
-        lblGraduated: "Tamomlagan (yil va maktab/litsey) *",
-        lblContact: "Telefon nomeri *",
-        lblLanguages: "Qaysi chet tillarini biladi",
-        lblAwards: "Davlat mukofotlari bilan taqdirlanganmi (qanaqa)",
-        lblPhoto: "3x4 Rasm",
-        btnChoosePhoto: "📷 Rasm tanlash",
-        photoHint: "O'ng tepa burchakka rasmiy ramkada joylashadi",
-        lblSecRel: "SHAXSIY MA’LUMOTLARI",
-        lblRelHint: "Otasi, onasi, akasi, ukasi, opasi, singlisi",
-        btnAddRel: "+ Oila a’zosini qo‘shish",
-        lblSecAch: "ERISHGAN YUTUQLARI",
-        lblAchHint: "Har bir yutuqni yangi qatordan yozing (avtomatik 1., 2., 3. raqamlanadi):",
-        btnDocxText: "Word (.docx)",
-        btnPdfText: "PDF (.pdf)",
-        relKind: "Qarindoshligi (OTASI, ONASI...)",
-        relFio: "Familiyasi, ismi va otasining ismi",
-        relBirth: "Tug‘ilgan sanasi (1969.05.14)",
-        relAddr: "Yashash manzili (Viloyat, tuman, MFY/qishloq, uy)",
-        relJob: "Kasbi yoki ish joyi (Fermer, Uy bekasi, O‘qituvchi...)",
-        relOptions: ["OTASI", "ONASI", "AKASI", "UKASI", "OPASI", "SINGLISI", "TURMUSH O‘RTOG‘I"]
-      },
-      cyr: {
-        appTitle: "МАЪЛУМОТНОМА",
-        appSub: "Талабалар учун расмий объективка платформаси",
-        lblSmartTitle: "1-босишда тайёр намуна",
-        btnDemo: "🎯 Намуна тўлдириш (Ўринов Рустамжон)",
-        btnSmartParse: "Матндан автоматик тўлдириш",
-        lblSecPersonal: "Талаба маълумотлари",
-        lblFio: "Фамилия, исм ва отасининг исми *",
-        lblPosition: "Университет, факультет, йўналиш, гуруҳ ва курс *",
-        lblBirthDate: "Туғилган йили *",
-        lblBirthPlace: "Туғилган жойи *",
-        lblNationality: "Миллати *",
-        lblSpecialty: "Таълим йўналиши *",
-        lblGraduated: "Тамомлаган (йил ва мактаб/лицей) *",
-        lblContact: "Телефон номери *",
-        lblLanguages: "Қайси чет тилларини билади",
-        lblAwards: "Давлат мукофотлари билан тақдирланганми (қанақа)",
-        lblPhoto: "3x4 Расм",
-        btnChoosePhoto: "📷 Расм танлаш",
-        photoHint: "Ўнг тепа бурчакка расмий рамкада жойлашади",
-        lblSecRel: "ШАХСИЙ МАЪЛУМОТЛАРИ",
-        lblRelHint: "Отаси, онаси, акаси, укаси, опаси, синглиси",
-        btnAddRel: "+ Оила аъзосини қўшиш",
-        lblSecAch: "ЭРИШГАН ЮТУҚЛАРИ",
-        lblAchHint: "Ҳар бир ютуқни янги қатордан ёзинг (автоматик 1., 2., 3. рақамланади):",
-        btnDocxText: "Word (.docx)",
-        btnPdfText: "PDF (.pdf)",
-        relKind: "Қариндошлиги (ОТАСИ, ОНАСИ...)",
-        relFio: "Фамилияси, исми ва отасининг исми",
-        relBirth: "Туғилган санаси (1969.05.14)",
-        relAddr: "Яшаш манзили",
-        relJob: "Касби ёки иш жойи",
-        relOptions: ["ОТАСИ", "ОНАСИ", "АКАСИ", "УКАСИ", "ОПАСИ", "СИНГЛИСИ", "ТУРМУШ ЎРТОҒИ"]
-      },
-      ru: {
-        appTitle: "СПРАВКА-ОБЪЕКТИВКА",
-        appSub: "Официальная студенческая объективка",
-        lblSmartTitle: "Готовый образец в 1 клик",
-        btnDemo: "🎯 Заполнить образец",
-        btnSmartParse: "Заполнить автоматически из текста",
-        lblSecPersonal: "Данные студента",
-        lblFio: "Фамилия, имя и отчество *",
-        lblPosition: "Университет, факультет, направление, группа и курс *",
-        lblBirthDate: "Дата рождения *",
-        lblBirthPlace: "Место рождения *",
-        lblNationality: "Национальность *",
-        lblSpecialty: "Направление обучения *",
-        lblGraduated: "Окончил(а) (год и школа/лицей) *",
-        lblContact: "Номер телефона *",
-        lblLanguages: "Какими иностранными языками владеет",
-        lblAwards: "Награждён(а) ли гос. наградами (какими)",
-        lblPhoto: "Фото 3x4",
-        btnChoosePhoto: "📷 Выбрать фото",
-        photoHint: "Размещается в правом верхнем углу",
-        lblSecRel: "ЛИЧНЫЕ СВЕДЕНИЯ",
-        lblRelHint: "Отец, мать, братья, сёстры",
-        btnAddRel: "+ Добавить члена семьи",
-        lblSecAch: "ДОСТИЖЕНИЯ",
-        lblAchHint: "Каждое достижение укажите с новой строки (нумеруется автоматически):",
-        btnDocxText: "Word (.docx)",
-        btnPdfText: "PDF (.pdf)",
-        relKind: "Степень родства",
-        relFio: "Фамилия, имя, отчество",
-        relBirth: "Дата рождения (1969.05.14)",
-        relAddr: "Адрес проживания",
-        relJob: "Род занятий / место работы",
-        relOptions: ["ОТЕЦ", "МАТЬ", "БРАТ", "СЕСТРА", "СУПРУГ(А)"]
-      }
+    const REL_KINDS = {
+      lat: ["OTASI", "ONASI", "AKASI", "UKASI", "OPASI", "SINGLISI", "TURMUSH O‘RTOG‘I", "QAYNOTASI", "QAYNONASI"],
+      cyr: ["ОТАСИ", "ОНАСИ", "АКАСИ", "УКАСИ", "ОПАСИ", "СИНГЛИСИ", "ТУРМУШ ЎРТОҒИ", "ҚАЙНОТАСИ", "ҚАЙНОНАСИ"],
+      ru: ["ОТЕЦ", "МАТЬ", "БРАТ", "СЕСТРА", "СУПРУГ(А)"]
     };
+
+    // O'zbek Lotin <-> Kirill bir zumda o'giruvchi funksiyalar
+    function latToCyr(text) {
+      if (!text) return "";
+      let s = text
+        .replace(/(^|[\s(\["'-])e/g, '$1э')
+        .replace(/(^|[\s(\["'-])E/g, '$1Э');
+      const multi = [
+        [/O‘|O'|O’|O`/g, "Ў"], [/o‘|o'|o’|o`/g, "ў"],
+        [/G‘|G'|G’|G`/g, "Ғ"], [/g‘|g'|g’|g`/g, "ғ"],
+        [/SH|Sh/g, "Ш"], [/sh/g, "ш"],
+        [/CH|Ch/g, "Ч"], [/ch/g, "ч"],
+        [/YO|Yo/g, "Ё"], [/yo/g, "ё"],
+        [/YU|Yu/g, "Ю"], [/yu/g, "ю"],
+        [/YA|Ya/g, "Я"], [/ya/g, "я"],
+        [/YE|Ye/g, "Е"], [/ye/g, "е"],
+        [/TS|Ts/g, "Ц"], [/ts/g, "ц"],
+        [/’|'|`|‘/g, "ъ"]
+      ];
+      for (const [rgx, rep] of multi) s = s.replace(rgx, rep);
+      const map = {
+        A:'А',a:'а',B:'Б',b:'б',D:'Д',d:'д',E:'Э',e:'е',F:'Ф',f:'ф',G:'Г',g:'г',
+        H:'Ҳ',h:'ҳ',I:'И',i:'и',J:'Ж',j:'ж',K:'К',k:'к',L:'Л',l:'л',M:'М',m:'м',
+        N:'Н',n:'н',O:'О',o:'о',P:'П',p:'п',Q:'Қ',q:'қ',R:'Р',r:'р',S:'С',s:'с',
+        T:'Т',t:'т',U:'У',u:'у',V:'В',v:'в',X:'Х',x:'х',Y:'Й',y:'й',Z:'З',z:'з'
+      };
+      return s.split('').map(c => map[c] || c).join('');
+    }
+
+    function cyrToLat(text) {
+      if (!text) return "";
+      const map = {
+        'А':'A','а':'a','Б':'B','б':'b','В':'V','в':'v','Г':'G','г':'g','Д':'D','д':'d',
+        'Ё':'Yo','ё':'yo','Ж':'J','ж':'j','З':'Z','з':'z','И':'I','и':'i','Й':'Y','й':'y',
+        'К':'K','к':'k','Л':'L','л':'l','М':'M','м':'m','Н':'N','н':'n','О':'O','о':'o',
+        'П':'P','п':'p','Р':'R','р':'r','С':'S','с':'s','Т':'T','т':'t','У':'U','у':'u',
+        'Ф':'F','ф':'f','Х':'X','х':'x','Ц':'Ts','ц':'ts','Ч':'Ch','ч':'ch','Ш':'Sh','ш':'sh',
+        'Ъ':'’','ъ':'’','Ь':'','ь':'','Э':'E','э':'e','Ю':'Yu','ю':'yu','Я':'Ya','я':'ya',
+        'Ў':'O‘','ў':'o‘','Қ':'Q','қ':'q','Ғ':'G‘','ғ':'g‘','Ҳ':'H','ҳ':'h'
+      };
+      let out = '';
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === 'Е' || ch === 'е') {
+          const prev = i > 0 ? text[i - 1] : ' ';
+          if (i === 0 || ' \n\t(["\'-аоуэияёюеўАОУЭИЯЁЮЕЎ'.includes(prev)) {
+            out += ch === 'Е' ? 'Ye' : 'ye';
+          } else {
+            out += ch === 'Е' ? 'E' : 'e';
+          }
+        } else {
+          out += map[ch] !== undefined ? map[ch] : ch;
+        }
+      }
+      return out;
+    }
 
     function setVal(id, val) {
       const el = document.getElementById(id);
-      if (el) {
-        el.value = val;
-        saveDraft();
+      if (el) el.value = currentLang === 'cyr' ? latToCyr(val) : val;
+    }
+
+    function setTemplateMode(mode) {
+      currentTemplate = mode;
+      document.getElementById('modeStudentBtn').classList.toggle('active', mode === 'student');
+      document.getElementById('modeClassicBtn').classList.toggle('active', mode === 'classic');
+
+      const classicBox = document.getElementById('classicFieldsBox');
+      const lblPos = document.getElementById('lblPosition');
+      const posInput = document.getElementById('position');
+      const sec2Title = document.getElementById('sec2Title');
+
+      if (mode === 'classic') {
+        classicBox.style.display = 'block';
+        lblPos.innerText = currentLang === 'cyr'
+          ? "Ҳозирги иш жойи ва лавозими (қачондан буён) *"
+          : "Hozirgi ish joyi va lavozimi (qachondan buyon) *";
+        posInput.placeholder = "Masalan: 2022 yildan buyon:\nFarg‘ona viloyati Uchko‘prik tumani 5-umumiy o‘rta ta’lim maktabi o‘qituvchisi";
+        sec2Title.innerText = currentLang === 'cyr'
+          ? "👨‍👩‍👧 2. Яқин қариндошлари ҳақида МАЪЛУМОТ"
+          : "👨‍👩‍👧 2. Yaqin qarindoshlari haqida MA’LUMOT";
+      } else {
+        classicBox.style.display = 'none';
+        lblPos.innerText = currentLang === 'cyr'
+          ? "Университет, факультет, йўналиш, гуруҳ ва курс *"
+          : "Universitet, fakultet, yo‘nalish, guruh va kurs *";
+        posInput.placeholder = "Masalan: Axborot texnologiyalari va menejment universiteti,\nIjtimoiy fanlar fakulteti Filologiya va tillarni o‘qitish (arab tili) ta’lim yo‘nalishi Ar-125-24-guruh, 1-kurs talabasi";
+        sec2Title.innerText = currentLang === 'cyr'
+          ? "👨‍👩‍👧 2. ШАХСИЙ МАЪЛУМОТЛАРИ (Оила аъзолари)"
+          : "👨‍👩‍👧 2. SHAXSIY MA’LUMOTLARI (Oila a’zolari)";
       }
     }
 
     function setLang(lang) {
+      const prevLang = currentLang;
       currentLang = lang;
       document.querySelectorAll('.lang-btn').forEach((btn, idx) => {
         btn.classList.toggle('active', (lang === 'lat' && idx === 0) || (lang === 'cyr' && idx === 1) || (lang === 'ru' && idx === 2));
       });
 
-      const t = UI_TEXT[lang];
-      for (const [id, val] of Object.entries(t)) {
-        const el = document.getElementById(id);
-        if (el && typeof val === 'string') el.innerText = val;
-      }
-
-      document.querySelectorAll('.rel-kind-select').forEach(sel => {
-        sel.innerHTML = '';
-        t.relOptions.forEach(r => {
-          const o = document.createElement('option');
-          o.value = r;
-          o.innerText = r;
-          sel.appendChild(o);
+      // Agar Lotin <-> Kirill almashtirilsa, formadagi barcha yozuvlarni avtomatik o'giramiz!
+      if ((prevLang === 'lat' && lang === 'cyr') || (prevLang === 'cyr' && lang === 'lat')) {
+        const conv = lang === 'cyr' ? latToCyr : cyrToLat;
+        const ids = ['fio','position','birth_date','birth_place','nationality','specialty','graduated','contact','languages','awards','education','party','degree','title','military','deputy','work','achievements'];
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && el.value) el.value = conv(el.value);
         });
-      });
-    }
-
-    // 🎯 Siz yuborgan O'rinov Rustamjon namunasini 100% bir xil to'ldirish
-    function fillRustamjonSample() {
-      document.getElementById('fio').value = "O‘rinov Rustamjon Akmaljon o‘g‘li";
-      document.getElementById('position').value =
-        "Axborot texnologiyalari va menejment universiteti,\n" +
-        "Ijtimoiy fanlar fakulteti Filologiya va tillarni o‘qitish (arab tili) ta’lim\n" +
-        "yo‘nalishi Ar-125-24-guruh, 1-kurs talabasi";
-      document.getElementById('birth_date').value = "14.07.2003 y";
-      document.getElementById('birth_place').value = "Farg‘ona viloyati Uchko‘prik tumani";
-      document.getElementById('nationality').value = "O‘zbek";
-      document.getElementById('specialty').value = "Filologiya va tillarni o‘qitish (arab tili)";
-      document.getElementById('graduated').value = "2021-yil Uchko‘prik t. 5-umumiy o‘rta ta’lim maktabi";
-      document.getElementById('contact').value = "+998943987505";
-      document.getElementById('languages').value = "Arab tili (sertifikat At Tanal B1)";
-      document.getElementById('awards').value = "yo‘q";
-
-      const container = document.getElementById('relativesList');
-      container.innerHTML = '';
-      addRelativeRow({
-        kind: "OTASI",
-        fio: "Madatov Akmaljon O’rinovich",
-        birth: "1969.05.14",
-        addr: "Farg’ona viloyati Uchko’prik tumani Qummozor qishlog’i 4-uy",
-        job: "Fermer"
-      });
-      addRelativeRow({
-        kind: "ONASI",
-        fio: "Madatova Dilshodaxon Xomidovna",
-        birth: "1968.08.03",
-        addr: "Farg’ona viloyati Uchko’prik tumani Qummozor qishlog’i 4-uy",
-        job: "Uy bekasi"
-      });
-      addRelativeRow({
-        kind: "AKASI",
-        fio: "O’rinov Abdurouf Akmaljon o’g’li",
-        birth: "1994.07.21",
-        addr: "Farg’ona viloyati Uchko’prik tumani Qummozor qishlog’i 4-uy",
-        job: "Tadbirkor"
-      });
-      addRelativeRow({
-        kind: "OPASI",
-        fio: "Jabborova Dilafuro’z Akmaljon qizi",
-        birth: "1996.10.13",
-        addr: "Farg’ona viloyati Buvayda tumani Jov qishlog’i 19-uy",
-        job: "Buvayda tumani 38-umumiy o’rta ta’lim maktbi Fizika fani o’qituvchisi"
-      });
-      addRelativeRow({
-        kind: "AKASI",
-        fio: "O’rinboyev Abdullajon Akmaljon o’g’li",
-        birth: "1998.12.05",
-        addr: "Farg’ona viloyati Uchko’prik tumani Qummozor qishlog’i 4-uy",
-        job: "Tadbirkor"
-      });
-
-      document.getElementById('achievements').value =
-        "25 noyabr 2024 yilda Universitetda bo’lib o’tgan “Marifat Ulashib “ loyihasi doirasida adiblar hayoti va ijodiga bag’ishlangan zakovat musobaqasida jamoa tarkibida 2-o’rinni qo’lga kiritgani uchun Tashakkurnoma bilan taqdirlangan.\n" +
-        "30-yanvar 2025 yilda S.Nasafiy Kutubxonasida bo’lib o’tgan “NE NAVO SO’ZAYLAGAY’’ nomli tadbirda faol ishtiroki uchun TASHAKKURNOMA bilan taqdirlangan.\n" +
-        "10 fevral 2025 yilda Matematika fanidan onlayn olimpiadada sertifikat bilan taqdirlangan";
-
-      saveDraft();
-    }
-
-    function parseSmartText() {
-      const text = document.getElementById('smartInput').value.trim();
-      if (!text) return;
-
-      const dateMatch = text.match(/(\d{1,2}[./-]\d{1,2}[./-]\d{2,4})/);
-      if (dateMatch) document.getElementById('birth_date').value = dateMatch[1] + " y";
-
-      const words = text.split(/\s+/);
-      if (words.length >= 2) {
-        let fioGuess = words[0] + " " + words[1];
-        if (words[2] && !/\d/.test(words[2])) {
-          fioGuess += " " + words[2];
-          if (words[3] && (words[3].toLowerCase().includes("o‘g‘li") || words[3].toLowerCase().includes("o'g'li") || words[3].toLowerCase().includes("qizi"))) {
-            fioGuess += " " + words[3];
-          }
-        }
-        document.getElementById('fio').value = fioGuess.replace(/[,.]/g, '');
+        document.querySelectorAll('#relativesList .relative-item').forEach(item => {
+          ['rel_fio','rel_birth','rel_addr','rel_job'].forEach(name => {
+            const inp = item.querySelector(`[name="${name}"]`);
+            if (inp && inp.value) inp.value = conv(inp.value);
+          });
+        });
       }
 
-      const placeMatch = text.match(/([A-Za-zА-Яа-яЎўҚқҒғҲҳ'ʻ`\s]+(?:viloyati|tumani|shahri)[A-Za-zА-Яа-яЎўҚқҒғҲҳ'ʻ`\s]*)/i);
-      if (placeMatch) {
-        document.getElementById('birth_place').value = placeMatch[1].trim();
-      }
+      const kinds = REL_KINDS[lang] || REL_KINDS.lat;
+      document.querySelectorAll('.rel-kind-select').forEach((sel, idx) => {
+        const curIdx = sel.selectedIndex >= 0 ? sel.selectedIndex : (idx % kinds.length);
+        sel.innerHTML = kinds.map((k, i) => `<option value="${k}" ${i === curIdx ? 'selected' : ''}>${k}</option>`).join('');
+      });
 
-      saveDraft();
+      setTemplateMode(currentTemplate);
     }
 
+    // 3x4 Aqlli Rasm Kesuvchi (Canvas Smart Center-Crop 600x800)
     function handlePhotoUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(evt) {
-        base64Photo = evt.target.result;
-        document.getElementById('photoPreview').innerHTML = `<img src="${base64Photo}">`;
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const targetW = 600;
+          const targetH = 800; // Aniq 3:4 nisbat
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext('2d');
+
+          const srcRatio = img.width / img.height;
+          const dstRatio = targetW / targetH;
+          let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+          if (srcRatio > dstRatio) {
+            sw = img.height * dstRatio;
+            sx = (img.width - sw) / 2;
+          } else {
+            sh = img.width / dstRatio;
+            sy = (img.height - sh) * 0.25; // Yuz qismi teparoqda bo'lgani uchun 25% dan olamiz
+          }
+
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillRect(0, 0, targetW, targetH);
+          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetW, targetH);
+
+          base64Photo = canvas.toDataURL('image/jpeg', 0.9);
+          document.getElementById('photoPreview').innerHTML = `<img src="${base64Photo}">`;
+        };
+        img.src = evt.target.result;
       };
       reader.readAsDataURL(file);
     }
 
-    function addRelativeRow(data = {}) {
+    function addRelativeRow(prefill = null) {
       const container = document.getElementById('relativesList');
-      const t = UI_TEXT[currentLang];
-      const div = document.createElement('div');
-      div.className = 'rel-card';
+      const idx = container.children.length;
+      const kinds = REL_KINDS[currentLang] || REL_KINDS.lat;
+      const selectedKind = prefill?.kind || kinds[idx % kinds.length];
 
-      let optHtml = t.relOptions.map(r => `<option value="${r}" ${data.kind === r ? 'selected' : ''}>${r}</option>`).join('');
+      const div = document.createElement('div');
+      div.className = 'relative-item';
+
+      const optHtml = kinds.map(r => `<option value="${r}" ${r === selectedKind ? 'selected' : ''}>${r}</option>`).join('');
 
       div.innerHTML = `
-        <button type="button" class="rel-del" onclick="this.parentElement.remove(); saveDraft();">✕</button>
-        <div class="field">
-          <label>${t.relKind}</label>
+        <span class="rel-badge">#${idx + 1} Oila a’zosi</span>
+        <button type="button" class="remove-rel-btn" onclick="this.parentElement.remove()">✕ O‘chirish</button>
+        <div class="form-group">
+          <label>Qarindoshligi</label>
           <select class="rel-kind-select" name="rel_kind">${optHtml}</select>
         </div>
-        <div class="field">
-          <label>${t.relFio}</label>
-          <input type="text" name="rel_fio" value="${data.fio || ''}" placeholder="Madatov Akmaljon O‘rinovich">
+        <div class="form-group">
+          <label>Familiyasi, ismi va otasining ismi</label>
+          <input type="text" name="rel_fio" value="${prefill?.fio || ''}" placeholder="Masalan: Madatov Akmaljon O‘rinovich">
         </div>
-        <div class="field">
-          <label>${t.relBirth}</label>
-          <input type="text" name="rel_birth" value="${data.birth || ''}" placeholder="1969.05.14">
+        <div class="form-group">
+          <label>Tug‘ilgan sanasi (yoki yili va joyi)</label>
+          <input type="text" name="rel_birth" value="${prefill?.birth || ''}" placeholder="Masalan: 1969.05.14">
         </div>
-        <div class="field">
-          <label>${t.relAddr}</label>
-          <input type="text" name="rel_addr" value="${data.addr || ''}" placeholder="Farg‘ona viloyati Uchko‘prik tumani Qummozor qishlog‘i 4-uy">
+        <div class="form-group">
+          <label>Yashash manzili (Turar joyi)</label>
+          <input type="text" name="rel_addr" value="${prefill?.address || ''}" placeholder="Masalan: Farg‘ona viloyati Uchko‘prik tumani Qummozor qishlog‘i 4-uy">
         </div>
-        <div class="field">
-          <label>${t.relJob}</label>
-          <input type="text" name="rel_job" value="${data.job || ''}" placeholder="Fermer / Uy bekasi / O‘qituvchi">
+        <div class="form-group">
+          <label>Kasbi yoki ish joyi va lavozimi</label>
+          <input type="text" name="rel_job" value="${prefill?.job || ''}" placeholder="Masalan: Fermer / Uy bekasi / O‘qituvchi / Nafaqada">
+          <div class="chips">
+            <span class="chip" onclick="this.parentElement.previousElementSibling.value = (currentLang==='cyr'?'Фермер':'Fermer')">Fermer</span>
+            <span class="chip" onclick="this.parentElement.previousElementSibling.value = (currentLang==='cyr'?'Уй бекаси':'Uy bekasi')">Uy bekasi</span>
+            <span class="chip" onclick="this.parentElement.previousElementSibling.value = (currentLang==='cyr'?'Тадбиркор':'Tadbirkor')">Tadbirkor</span>
+            <span class="chip" onclick="this.parentElement.previousElementSibling.value = (currentLang==='cyr'?'Ўқитувчи':'O‘qituvchi')">O‘qituvchi</span>
+            <span class="chip" onclick="this.parentElement.previousElementSibling.value = (currentLang==='cyr'?'Нафақада':'Nafaqada')">Nafaqada</span>
+            <span class="chip" onclick="this.parentElement.previousElementSibling.value = (currentLang==='cyr'?'Талаба':'Talaba')">Talaba</span>
+          </div>
         </div>
       `;
       container.appendChild(div);
     }
 
-    function saveDraft() {
-      try {
-        const fields = ['fio', 'position', 'birth_date', 'birth_place', 'nationality', 'specialty', 'graduated', 'contact', 'languages', 'awards', 'achievements'];
-        const draft = {};
-        fields.forEach(k => {
-          const el = document.getElementById(k);
-          if (el) draft[k] = el.value;
-        });
-        localStorage.setItem('obyektivka_student_v4', JSON.stringify(draft));
-      } catch (e) {}
-    }
+    function fillSample() {
+      if (currentTemplate === 'classic') {
+        document.getElementById('fio').value = "Karimov Sardorbek Rustamovich";
+        document.getElementById('position').value = "2022 yildan buyon:\nFarg‘ona viloyati Uchko‘prik tumani 5-umumiy o‘rta ta’lim maktabi o‘qituvchisi";
+        document.getElementById('birth_date').value = "14.07.1995 y.";
+        document.getElementById('birth_place').value = "Farg‘ona viloyati, Uchko‘prik tumani";
+        document.getElementById('nationality').value = "o‘zbek";
+        document.getElementById('education').value = "Oliy";
+        document.getElementById('party').value = "yo‘q";
+        document.getElementById('specialty').value = "Matematika va informatika o‘qituvchisi";
+        document.getElementById('graduated').value = "2018 y. Farg‘ona davlat universiteti (kunduzgi)";
+        document.getElementById('degree').value = "yo‘q";
+        document.getElementById('title').value = "yo‘q";
+        document.getElementById('contact').value = "+998901234567";
+        document.getElementById('languages').value = "rus, ingliz tillari";
+        document.getElementById('military').value = "yo‘q";
+        document.getElementById('awards').value = "yo‘q";
+        document.getElementById('deputy').value = "yo‘q";
+        document.getElementById('work').value =
+          "2014-2018 yy. - Farg‘ona davlat universiteti talabasi\n" +
+          "2018-2022 yy. - Uchko‘prik tumani 12-maktab matematika fani o‘qituvchisi\n" +
+          "2022 y. - h.v. - Uchko‘prik tumani 5-maktab matematika fani o‘qituvchisi";
+        document.getElementById('achievements').value = "";
+      } else {
+        document.getElementById('fio').value = "O‘rinov Rustamjon Akmaljon o‘g‘li";
+        document.getElementById('position').value = "Axborot texnologiyalari va menejment universiteti,\nIjtimoiy fanlar fakulteti Filologiya va tillarni o‘qitish (arab tili) ta’lim yo‘nalishi Ar-125-24-guruh, 1-kurs talabasi";
+        document.getElementById('birth_date').value = "14.07.2003 y";
+        document.getElementById('birth_place').value = "Farg‘ona viloyati Uchko‘prik tumani";
+        document.getElementById('nationality').value = "O‘zbek";
+        document.getElementById('specialty').value = "Filologiya va tillarni o‘qitish (arab tili)";
+        document.getElementById('graduated').value = "2021-yil Uchko‘prik t. 5-umumiy o‘rta ta’lim maktabi";
+        document.getElementById('contact').value = "+998943987505";
+        document.getElementById('languages').value = "Arab tili (sertifikat At Tanal B1)";
+        document.getElementById('awards').value = "yo‘q";
+        document.getElementById('achievements').value =
+          "25 noyabr 2024 yilda Universitetda bo‘lib o‘tgan “Ma’rifat Ulashib” loyihasi doirasida zakovat musobaqasida 2-o‘rinni qo‘lga kiritgani uchun Tashakkurnoma bilan taqdirlangan.\n" +
+          "10 fevral 2025 yilda Matematika fanidan onlayn olimpiadada sertifikat bilan taqdirlangan.";
+      }
 
-    function loadDraft() {
-      try {
-        const raw = localStorage.getItem('obyektivka_student_v4');
-        if (!raw) return;
-        const d = JSON.parse(raw);
-        for (const [k, v] of Object.entries(d)) {
-          const el = document.getElementById(k);
-          if (el && v) el.value = v;
-        }
-      } catch (e) {}
+      const relContainer = document.getElementById('relativesList');
+      relContainer.innerHTML = '';
+      addRelativeRow({
+        kind: "OTASI",
+        fio: "Madatov Akmaljon O‘rinovich",
+        birth: "1969.05.14",
+        address: "Farg‘ona viloyati Uchko‘prik tumani Qummozor qishlog‘i 4-uy",
+        job: "Fermer"
+      });
+      addRelativeRow({
+        kind: "ONASI",
+        fio: "Madatova Mamlakatxon Usmonovna",
+        birth: "1975.10.22",
+        address: "Farg‘ona viloyati Uchko‘prik tumani Qummozor qishlog‘i 4-uy",
+        job: "Uy bekasi"
+      });
+      addRelativeRow({
+        kind: "AKASI",
+        fio: "O‘rinov Dostonjon Akmaljon o‘g‘li",
+        birth: "1996.02.24",
+        address: "Farg‘ona viloyati Uchko‘prik tumani Qummozor qishlog‘i 4-uy",
+        job: "Tadbirkor"
+      });
+
+      if (currentLang === 'cyr') {
+        const tmp = currentLang;
+        currentLang = 'lat';
+        setLang(tmp);
+      }
     }
 
     function clearForm() {
@@ -925,34 +876,44 @@
       document.getElementById('relativesList').innerHTML = '';
       addRelativeRow({ kind: "OTASI" });
       addRelativeRow({ kind: "ONASI" });
-      localStorage.removeItem('obyektivka_student_v4');
     }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      addRelativeRow({ kind: "OTASI" });
+      addRelativeRow({ kind: "ONASI" });
+    });
 
     async function submitDoc(format) {
       const fio = document.getElementById('fio').value.trim();
       if (!fio) {
-        alert(currentLang === 'ru' ? "Пожалуйста, введите Ф.И.О.!" : "Iltimos, F.I.Sh. kiriting!");
+        alert("Iltimos, Familiya, ism va sharifingizni kiriting!");
         document.getElementById('fio').focus();
         return;
       }
 
       const relatives = [];
-      document.querySelectorAll('.rel-card').forEach(item => {
-        const kind = item.querySelector('[name="rel_kind"]')?.value || '';
-        const rfio = item.querySelector('[name="rel_fio"]')?.value.trim() || '';
-        const birth = item.querySelector('[name="rel_birth"]')?.value.trim() || '';
-        const address = item.querySelector('[name="rel_addr"]')?.value.trim() || '';
-        const job = item.querySelector('[name="rel_job"]')?.value.trim() || '';
-        if (rfio || job || birth || address) {
-          relatives.push({ kind, fio: rfio, birth, address, job });
+      document.querySelectorAll('#relativesList .relative-item').forEach(item => {
+        const kind = item.querySelector('[name="rel_kind"]').value;
+        const r_fio = item.querySelector('[name="rel_fio"]').value.trim();
+        const r_birth = item.querySelector('[name="rel_birth"]').value.trim();
+        const r_addr = item.querySelector('[name="rel_addr"]').value.trim();
+        const r_job = item.querySelector('[name="rel_job"]').value.trim();
+
+        if (r_fio || r_birth || r_job || r_addr) {
+          relatives.push({
+            kind: kind,
+            fio: r_fio,
+            birth: r_birth,
+            address: r_addr,
+            job: r_job
+          });
         }
       });
-
-      const tgUserId = tg?.initDataUnsafe?.user?.id || null;
 
       const payload = {
         lang: currentLang,
         format: format,
+        template_type: currentTemplate,
         fio: fio,
         position: document.getElementById('position').value.trim(),
         birth_date: document.getElementById('birth_date').value.trim(),
@@ -961,12 +922,19 @@
         specialty: document.getElementById('specialty').value.trim(),
         graduated: document.getElementById('graduated').value.trim(),
         contact: document.getElementById('contact').value.trim(),
-        languages: document.getElementById('languages').value.trim() || "yo‘q",
+        languages: document.getElementById('languages').value.trim(),
         awards: document.getElementById('awards').value.trim() || "yo‘q",
+        education: document.getElementById('education').value.trim(),
+        party: document.getElementById('party').value.trim(),
+        degree: document.getElementById('degree').value.trim(),
+        title: document.getElementById('title').value.trim(),
+        military: document.getElementById('military').value.trim(),
+        deputy: document.getElementById('deputy').value.trim(),
+        work: document.getElementById('work').value.trim(),
         achievements: document.getElementById('achievements').value.trim(),
         photo_base64: base64Photo,
         relatives: relatives,
-        user_id: tgUserId,
+        user_id: tg?.initDataUnsafe?.user?.id || null,
         init_data: tg?.initData || ""
       };
 
@@ -974,38 +942,34 @@
       overlay.style.display = 'flex';
 
       try {
-        const response = await fetch('/api/generate', {
+        const res = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
-        if (!response.ok) throw new Error("Server xatoligi");
+        if (!res.ok) throw new Error("Server xatosi");
 
-        const blob = await response.blob();
+        const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.style.display = 'none';
         a.href = url;
         const ext = format === 'pdf' ? 'pdf' : 'docx';
         a.download = `Obyektivka_${fio.replace(/\s+/g, '_')}.${ext}`;
         document.body.appendChild(a);
         a.click();
+        a.remove();
         window.URL.revokeObjectURL(url);
 
-        if (tg && tg.showAlert) {
-          tg.showAlert(currentLang === 'ru' ? "✅ Готово! Файл также отправлен вам в Telegram." : "✅ Tayyor! Obyektivka Telegram lichkangizga ham yuborildi.");
+        if (tg?.initDataUnsafe?.user?.id) {
+          alert("✅ Obyektivka tayyor bo‘ldi va Telegram bot chatingizga ham yuborildi!");
         }
       } catch (err) {
-        alert("Xatolik: " + err.message);
+        alert("Xatolik yuz berdi: " + err.message);
       } finally {
         overlay.style.display = 'none';
       }
     }
-
-    loadDraft();
-    addRelativeRow({ kind: "OTASI" });
-    addRelativeRow({ kind: "ONASI" });
   </script>
 </body>
 </html>

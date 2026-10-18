@@ -114,7 +114,13 @@ def get_rel_more_kb(lang: str):
         ]
     ], resize_keyboard=True, one_time_keyboard=True)
 
-def get_format_kb(lang: str):
+def get_format_kb(lang: str, current_tpl: str = "student"):
+    alt_script_text = "🔄 Kirillda olish (Авто-ўгириш)" if lang == "lat" else "🔄 Lotinda olish (Avto-o‘girish)"
+    tpl_switch_text = (
+        "🏛 Klassik shaklga o‘tish (Ish uchun)"
+        if current_tpl == "student" else
+        "🎓 Talaba shakliga o‘tish"
+    )
     return InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text=T[lang]["btn_pdf"], callback_data="get_pdf"),
@@ -124,6 +130,12 @@ def get_format_kb(lang: str):
             InlineKeyboardButton(text=T[lang]["btn_both"], callback_data="get_both"),
         ],
         [
+            InlineKeyboardButton(text=alt_script_text, callback_data="toggle_doc_script"),
+        ],
+        [
+            InlineKeyboardButton(text=tpl_switch_text, callback_data="toggle_doc_tpl"),
+        ],
+        [
             InlineKeyboardButton(text=T[lang]["btn_restart"], callback_data="restart"),
         ]
     ])
@@ -131,36 +143,36 @@ def get_format_kb(lang: str):
 def get_welcome_card(lang: str, first_name: str = ""):
     cards = {
         "lat": (
-            f"🎓 <b>Assalomu alaykum{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Abivtivkabot</b> — talabalar uchun rasmiy namuna asosida "
-            "<b>Obyektivka (Ma’lumotnoma)</b> tayyorlab beruvchi zamonaviy platforma.\n\n"
-            "✨ <b>Imkoniyatlar:</b>\n"
-            "• 🎯 <b>Talaba namunasi</b> — OTM va dekanatlar talab qiladigan aniq shakl\n"
-            "• 📸 <b>3x4 rasm</b> — galereyadan yuklash\n"
-            "• 📄 <b>Word va PDF</b> — tahrirlanadigan va tayyor formatlar\n"
-            "• 🆓 <b>100% bepul</b> va reklamasiz\n\n"
-            "👇 <i>Quyidagi o'zingizga qulay usulni tanlang:</i>"
+            f"📋 <b>Assalomu alaykum{', ' + first_name if first_name else ''}!</b>\n\n"
+            "<b>Abivtivkabot</b> — barcha uchun (talabalar, o‘qituvchilar, shifokorlar va davlat xizmatchilari) "
+            "rasmiy <b>Obyektivka (Ma’lumotnoma)</b> tayyorlab beruvchi universal platforma.\n\n"
+            "✨ <b>Yangi imkoniyatlar:</b>\n"
+            "• 🏛 <b>2 xil shablon</b> — Talaba namunasi hamda Klassik 3.5-shakl (Mehnat faoliyati bilan)\n"
+            "• 🔄 <b>Lotin ↔ Kirill</b> — 1 marta yozib, xohlagan alifboda yuklab olish\n"
+            "• 📸 <b>Aqlli 3x4 rasm</b> — istalgan rasmni avtomatik 3x4 formatga keltirish\n"
+            "• 📄 <b>Word va PDF</b> — 100% bepul va tayyor formatlar\n\n"
+            "👇 <i>Quyidagi o‘zingizga qulay usulni tanlang:</i>"
         ),
         "cyr": (
-            f"🎓 <b>Ассалому алайкум{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Abivtivkabot</b> — талабалар учун расмий намуна асосида "
-            "<b>Объективка (Маълумотнома)</b> тайёрлаб берувчи замонавий платформа.\n\n"
-            "✨ <b>Имкониятлар:</b>\n"
-            "• 🎯 <b>Талаба намунаси</b> — ОТМ ва деканатлар талаб қиладиган аниқ шакл\n"
-            "• 📸 <b>3x4 расм</b> — галереядан юклаш\n"
-            "• 📄 <b>Word ва PDF</b> — таҳрирланадиган ва тайёр форматлар\n"
-            "• 🆓 <b>100% бепул</b> ва рекламасиз\n\n"
+            f"📋 <b>Ассалому алайкум{', ' + first_name if first_name else ''}!</b>\n\n"
+            "<b>Abivtivkabot</b> — барча учун (талабалар, ўқитувчилар, шифокорлар ва давлат хизматчилари) "
+            "расмий <b>Объективка (Маълумотнома)</b> тайёрлаб берувчи универсал платформа.\n\n"
+            "✨ <b>Янги имкониятлар:</b>\n"
+            "• 🏛 <b>2 хил шаблон</b> — Талаба намунаси ҳамда Классик 3.5-шакл (Меҳнат фаолияти билан)\n"
+            "• 🔄 <b>Лотин ↔ Кирилл</b> — 1 марта ёзиб, хоҳлаган алифбода юклаб олиш\n"
+            "• 📸 <b>Ақлли 3x4 расм</b> — исталган расмни автоматик 3x4 форматга келтириш\n"
+            "• 📄 <b>Word ва PDF</b> — 100% бепул ва тайёр форматлар\n\n"
             "👇 <i>Қуйидаги ўзингизга қулай усулни танланг:</i>"
         ),
         "ru": (
-            f"🎓 <b>Здравствуйте{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Abivtivkabot</b> — современная платформа для бесплатного создания официальной "
-            "студенческой <b>Объективки (Справки)</b>.\n\n"
+            f"📋 <b>Здравствуйте{', ' + first_name if first_name else ''}!</b>\n\n"
+            "<b>Abivtivkabot</b> — универсальная платформа для бесплатного создания официальной "
+            "<b>Объективки (Справки)</b> для студентов, учителей и госслужащих.\n\n"
             "✨ <b>Возможности:</b>\n"
-            "• 🎯 <b>Точный студенческий шаблон</b> — личные данные, семья и достижения\n"
-            "• 📸 <b>Фото 3x4</b> — загрузка прямо из галереи\n"
-            "• 📄 <b>Word и PDF</b> — готовые государственные форматы\n"
-            "• 🆓 <b>100% бесплатно</b>\n\n"
+            "• 🏛 <b>2 шаблона</b> — Студенческий и Классический (госслужба / работа)\n"
+            "• 🔄 <b>Латиница ↔ Кириллица</b> — автоперевод в 1 клик\n"
+            "• 📸 <b>Умное фото 3x4</b> — автообрезка из галереи\n"
+            "• 📄 <b>Word и PDF</b> — 100% бесплатно\n\n"
             "👇 <i>Выберите удобный способ заполнения:</i>"
         )
     }
@@ -172,12 +184,31 @@ async def cmd_start(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data.get("lang", "lat")
     await state.clear()
-    await state.update_data(lang=lang, relatives=[])
+    await state.update_data(lang=lang, template_type="student", relatives=[])
     
     first_name = message.from_user.first_name or ""
     await message.answer(
         get_welcome_card(lang, first_name),
         reply_markup=get_main_menu_kb(lang)
+    )
+
+@dp.message(Command("stats"))
+async def cmd_stats(message: types.Message):
+    import json
+    stats_file = DOWNLOADS_DIR / "stats.json"
+    stats = {"total": 0, "pdf": 0, "docx": 0, "student": 0, "classic": 0}
+    if stats_file.exists():
+        try:
+            stats.update(json.loads(stats_file.read_text(encoding="utf-8")))
+        except Exception:
+            pass
+    await message.answer(
+        f"📊 <b>Bot statistikasi (Abivtivkabot):</b>\n\n"
+        f"📄 Jami tayyorlangan hujjatlar: <b>{stats.get('total', 0)}</b> ta\n"
+        f"• PDF formatda: <b>{stats.get('pdf', 0)}</b> ta\n"
+        f"• Word (.docx) formatda: <b>{stats.get('docx', 0)}</b> ta\n"
+        f"• 🎓 Talaba namunasi: <b>{stats.get('student', 0)}</b> ta\n"
+        f"• 🏛 Klassik (Ish/Xodim) namunasi: <b>{stats.get('classic', 0)}</b> ta"
     )
 
 @dp.message(Command("lang"))
@@ -211,9 +242,27 @@ async def cb_set_lang(call: types.CallbackQuery, state: FSMContext):
     )
     await call.answer()
 
-# Bot ichida savol-javob orqali davom etish
+# Bot ichida savol-javob orqali davom etish — oldin shablon turini so'raymiz
 @dp.callback_query(F.data == "start_chat_flow")
 async def cb_start_chat(call: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    lang = data.get("lang", "lat")
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🎓 Talabalar uchun (OTM / Yutuqlar)", callback_data="chat_tpl_student")],
+        [InlineKeyboardButton(text="🏛 Barcha / Ish uchun (Klassik 3.5-shakl)", callback_data="chat_tpl_classic")],
+    ])
+    prompt_text = {
+        "lat": "👇 <b>Qaysi shakl (shablon) bo‘yicha tayyorlaymiz?</b>",
+        "cyr": "👇 <b>Қайси шакл (шаблон) бўйича тайёрлаймиз?</b>",
+        "ru": "👇 <b>Выберите тип шаблона:</b>"
+    }.get(lang, "👇 <b>Qaysi shakl bo‘yicha tayyorlaymiz?</b>")
+    await call.message.edit_text(prompt_text, reply_markup=kb)
+    await call.answer()
+
+@dp.callback_query(F.data.in_(["chat_tpl_student", "chat_tpl_classic"]))
+async def cb_choose_chat_tpl(call: types.CallbackQuery, state: FSMContext):
+    tpl = "classic" if call.data == "chat_tpl_classic" else "student"
+    await state.update_data(template_type=tpl)
     data = await state.get_data()
     lang = data.get("lang", "lat")
     await call.message.delete()
@@ -468,13 +517,16 @@ async def fallback_handler(message: types.Message, state: FSMContext):
 async def show_finish_menu(message: types.Message, state: FSMContext):
     data = await state.get_data()
     lang = data["lang"]
+    tpl = data.get("template_type", "student")
     await state.set_state(ObyektivkaStates.finished)
     
     has_photo = T[lang]["photo_yes"] if data.get("photo_path") else T[lang]["photo_no"]
     n_rel = len(data.get("relatives", []))
+    tpl_name = "🎓 Talaba namunasi" if tpl == "student" else "🏛 Klassik (Ish/Xodim) namunasi"
     
     summary = (
         f"{T[lang]['preview']}\n\n"
+        f"📑 Shablon: <b>{tpl_name}</b>\n"
         f"👤 <b>{data.get('fio', '')}</b>\n"
         f"📅 {data.get('birth_date', '')}\n"
         f"📍 {data.get('birth_place', '')}\n"
@@ -486,21 +538,36 @@ async def show_finish_menu(message: types.Message, state: FSMContext):
     )
     
     await message.answer(summary, reply_markup=ReplyKeyboardRemove())
-    await message.answer("👇", reply_markup=get_format_kb(lang))
+    await message.answer("👇", reply_markup=get_format_kb(lang, tpl))
 
-@dp.callback_query(F.data.in_(["get_pdf", "get_docx", "get_both", "restart"]))
+@dp.callback_query(F.data.in_(["get_pdf", "get_docx", "get_both", "toggle_doc_script", "toggle_doc_tpl", "restart"]))
 async def cb_download(call: types.CallbackQuery, state: FSMContext):
     action = call.data
     data = await state.get_data()
     lang = data.get("lang", "lat")
+    tpl = data.get("template_type", "student")
     user_id = call.from_user.id
     
     if action == "restart":
         await state.clear()
-        await state.update_data(lang=lang, relatives=[])
+        await state.update_data(lang=lang, template_type="student", relatives=[])
         first_name = call.from_user.first_name or ""
         await call.message.answer(get_welcome_card(lang, first_name), reply_markup=get_main_menu_kb(lang))
         await call.answer()
+        return
+
+    if action == "toggle_doc_script":
+        new_lang = "cyr" if lang == "lat" else "lat"
+        await state.update_data(lang=new_lang)
+        await call.message.edit_reply_markup(reply_markup=get_format_kb(new_lang, tpl))
+        await call.answer("✅ Alifbo o‘zgartirildi! Endi PDF yoki Word tugmasini bosing.")
+        return
+
+    if action == "toggle_doc_tpl":
+        new_tpl = "classic" if tpl == "student" else "student"
+        await state.update_data(template_type=new_tpl)
+        await call.message.edit_reply_markup(reply_markup=get_format_kb(lang, new_tpl))
+        await call.answer("✅ Shablon turi o‘zgartirildi! Endi PDF yoki Word tugmasini bosing.")
         return
         
     await call.answer(T[lang]["generating"])
@@ -523,7 +590,7 @@ async def cb_download(call: types.CallbackQuery, state: FSMContext):
             )
             
         await msg_wait.delete()
-        await call.message.answer(T[lang]["ready"], reply_markup=get_format_kb(lang))
+        await call.message.answer(T[lang]["ready"], reply_markup=get_format_kb(lang, tpl))
     except Exception as e:
         logging.error(f"Generate error: {e}", exc_info=True)
         await msg_wait.edit_text(T[lang]["error"])
