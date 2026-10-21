@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import json
 import base64
 import uuid
@@ -7,7 +8,7 @@ from pathlib import Path
 from typing import List, Optional
 from pydantic import BaseModel
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse, HTMLResponse
 
 from aiogram import Bot
@@ -16,6 +17,7 @@ from dotenv import load_dotenv
 
 from generator_docx import generate_docx
 from generator_pdf import generate_pdf
+from ai_enhancer import enhance_text_with_ai
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
@@ -27,6 +29,21 @@ STATIC_DIR = BASE_DIR / "static"
 TEMP_DIR = BASE_DIR / "temp_files"
 TEMP_DIR.mkdir(exist_ok=True)
 STATS_FILE = TEMP_DIR / "stats.json"
+
+
+def cleanup_old_temp_files(max_age_seconds: int = 1800):
+    """30 daqiqadan eski vaqtinchalik fayllarni tozalaydi (stats.json qoladi)."""
+    try:
+        now = time.time()
+        for f in TEMP_DIR.glob("*"):
+            if f.is_file() and f.name != "stats.json":
+                if now - f.stat().st_mtime > max_age_seconds:
+                    try:
+                        f.unlink()
+                    except Exception:
+                        pass
+    except Exception:
+        pass
 
 
 def increment_stat(fmt: str, template_type: str):
@@ -48,6 +65,12 @@ class RelativeItem(BaseModel):
     birth: str = ""
     job: str = ""
     address: str = ""
+
+
+class EnhanceRequest(BaseModel):
+    text: str
+    category: Optional[str] = "achievements"  # "achievements" yoki "work"
+    lang: Optional[str] = "lat"
 
 
 class GenerateRequest(BaseModel):
@@ -104,8 +127,21 @@ async def get_stats():
     return {"total": 0, "pdf": 0, "docx": 0, "student": 0, "classic": 0}
 
 
+@app.post("/api/ai_enhance")
+async def api_ai_enhance(req: EnhanceRequest):
+    """OmniRoute sun'iy intellekti orqali matnni rasmiy tahrirlab berish."""
+    enhanced = enhance_text_with_ai(
+        text=req.text,
+        category=req.category or "achievements",
+        lang=req.lang or "lat"
+    )
+    return {"original": req.text, "enhanced": enhanced}
+
+
 @app.post("/api/generate")
-async def generate_document(req: GenerateRequest):
+async def generate_document(req: GenerateRequest, background_tasks: BackgroundTasks):
+    # Fon vazifasida eski fayllarni tozalash
+    background_tasks.add_task(cleanup_old_temp_files)
     req_id = str(uuid.uuid4())[:8]
 
     photo_path = None
@@ -146,7 +182,7 @@ async def generate_document(req: GenerateRequest):
         "work": req.work or "",
         "achievements": req.achievements or "",
         "photo_path": photo_path,
-        "relatives": [r.dict() for r in req.relatives]
+        "relatives": [r.model_dump() if hasattr(r, "model_dump") else r.dict() for r in req.relatives]
     }
 
     try:

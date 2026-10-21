@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import asyncio
 import logging
 import urllib.request
@@ -22,6 +23,7 @@ from aiogram.types import (
 from texts import T, LANGS, REL_KINDS, CHOOSE_LANG, LANG_BUTTONS
 from generator_docx import generate_docx
 from generator_pdf import generate_pdf
+from ai_enhancer import enhance_text_with_ai
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
@@ -30,6 +32,21 @@ WEBAPP_URL = os.getenv("WEBAPP_URL", "https://abivtivkabotbepul.onrender.com").s
 BASE_DIR = Path(__file__).parent
 DOWNLOADS_DIR = BASE_DIR / "temp_files"
 DOWNLOADS_DIR.mkdir(exist_ok=True)
+
+
+def cleanup_temp_files(max_age_seconds: int = 1800):
+    """30 daqiqadan eski vaqtinchalik fayllarni tozalaydi (stats.json saqlanadi)."""
+    try:
+        now = time.time()
+        for f in DOWNLOADS_DIR.glob("*"):
+            if f.is_file() and f.name != "stats.json":
+                if now - f.stat().st_mtime > max_age_seconds:
+                    try:
+                        f.unlink()
+                    except Exception:
+                        pass
+    except Exception:
+        pass
 
 class ObyektivkaStates(StatesGroup):
     lang = State()
@@ -616,8 +633,14 @@ async def process_achievements(message: types.Message, state: FSMContext):
     if message.text != T[lang]["btn_skip"] and not is_valid_text_min(message.text, 4):
         await message.answer(ERR_MSG[lang]["text"], reply_markup=get_skip_kb(lang))
         return
-    val = "" if message.text == T[lang]["btn_skip"] else message.text
-    await state.update_data(achievements=val.strip())
+    val = "" if message.text == T[lang]["btn_skip"] else message.text.strip()
+    if val:
+        # Sun'iy intellekt orqali rasmiy uslubda chiroyli tahrirlash (OmniRoute / AI)
+        try:
+            val = await asyncio.to_thread(enhance_text_with_ai, val, "achievements", lang)
+        except Exception:
+            pass
+    await state.update_data(achievements=val)
     await show_finish_menu(message, state)
 
 # Istalgan boshqa matn yozilganda asosiy menyuni chiqarish
@@ -713,10 +736,15 @@ async def cb_download(call: types.CallbackQuery, state: FSMContext):
         await msg_wait.edit_text(T[lang]["error"])
 
 async def keep_alive_ping():
-    """Render Free serveri uxlab qolmasligi uchun har 4 daqiqada o'zini uyg'otib turadi."""
+    """Render Free serveri uxlab qolmasligi uchun har 4 daqiqada o'zini uyg'otib turadi va eski fayllarni tozalaydi."""
     target_url = (os.getenv("RENDER_EXTERNAL_URL") or WEBAPP_URL or "https://abivtivkabotbepul.onrender.com").rstrip("/")
     while True:
-        await asyncio.sleep(240)  # Har 4 daqiqada (Render 15 daqiqada uxlab qoladi)
+        await asyncio.sleep(240)  # Har 4 daqiqada
+        try:
+            cleanup_temp_files(max_age_seconds=1800)  # 30 daqiqadan eski vaqtinchalik fayllarni tozalash
+        except Exception:
+            pass
+
         if target_url:
             for path in ("/health", "/"):
                 try:
