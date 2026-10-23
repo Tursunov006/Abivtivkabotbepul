@@ -389,8 +389,8 @@
   </div>
 
   <div class="header">
-    <h1 id="hdrTitle">📋 Universal Obyektivka (Ma’lumotnoma)</h1>
-    <p id="hdrSub">Talabalar, o‘qituvchilar va davlat xizmatchilari uchun (PDF / Word)</p>
+    <h1 id="hdrTitle">📋 Obyektivka PRO (Ma’lumotnoma)</h1>
+    <p id="hdrSub">Talabalar, o‘qituvchilar va davlat xizmatchilari uchun (PDF)</p>
     <div class="lang-switcher">
       <button class="lang-btn active" onclick="setLang('lat')">🇺🇿 Lotin</button>
       <button class="lang-btn" onclick="setLang('cyr')">🇺🇿 Кирилл (Avto-o‘girish)</button>
@@ -567,11 +567,8 @@
   </form>
 
   <div class="bottom-bar">
-    <button type="button" class="action-btn btn-docx" onclick="submitDoc('docx')">
-      📝 Word (.docx)
-    </button>
-    <button type="button" class="action-btn btn-pdf" onclick="submitDoc('pdf')">
-      📄 PDF (.pdf)
+    <button type="button" class="action-btn btn-pdf" id="btnMainPdf" onclick="submitDoc('pdf')">
+      📄 PDF shaklida yuklab olish
     </button>
   </div>
 
@@ -712,6 +709,11 @@
         const curIdx = sel.selectedIndex >= 0 ? sel.selectedIndex : (idx % kinds.length);
         sel.innerHTML = kinds.map((k, i) => `<option value="${k}" ${i === curIdx ? 'selected' : ''}>${k}</option>`).join('');
       });
+
+      const btnPdf = document.getElementById('btnMainPdf');
+      if (btnPdf) {
+        btnPdf.innerText = lang === 'cyr' ? '📄 PDF шаклида юклаб олиш' : (lang === 'ru' ? '📄 Скачать в формате PDF' : '📄 PDF shaklida yuklab olish');
+      }
 
       setTemplateMode(currentTemplate);
     }

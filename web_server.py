@@ -75,7 +75,7 @@ class EnhanceRequest(BaseModel):
 
 class GenerateRequest(BaseModel):
     lang: str = "lat"
-    format: str = "docx"  # "docx" yoki "pdf"
+    format: str = "pdf"  # "pdf" asosiy rasmiy format
     template_type: Optional[str] = "student"  # "student" yoki "classic"
     fio: str
     position: Optional[str] = ""
@@ -114,7 +114,7 @@ async def serve_index():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok", "service": "Abivtivkabot Universal 24/7"}
+    return {"status": "ok", "service": "Obyektivka PRO Universal 24/7"}
 
 
 @app.get("/api/stats")
@@ -203,10 +203,10 @@ async def generate_document(req: GenerateRequest, background_tasks: BackgroundTa
             try:
                 bot = Bot(token=BOT_TOKEN)
                 caption = (
-                    "✅ Obyektivkangiz tayyor! (@abivtivka_bot)"
+                    "✅ Rasmiy Obyektivkangiz tayyor! (PDF)"
                     if req.lang == "lat" else (
-                        "✅ Объективкангиз тайёр! (@abivtivka_bot)"
-                        if req.lang == "cyr" else "✅ Ваша объективка готова! (@abivtivka_bot)"
+                        "✅ Расмий Объективкангиз тайёр! (PDF)"
+                        if req.lang == "cyr" else "✅ Ваша официальная справка-объективка готова! (PDF)"
                     )
                 )
                 await bot.send_document(

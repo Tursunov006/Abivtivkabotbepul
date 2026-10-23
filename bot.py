@@ -138,13 +138,15 @@ def get_format_kb(lang: str, current_tpl: str = "student"):
         if current_tpl == "student" else
         "🎓 Talaba shakliga o‘tish"
     )
+    btn_pdf_text = {
+        "lat": "📄 PDF yuklab olish",
+        "cyr": "📄 PDF юклаб олиш",
+        "ru": "📄 Скачать PDF",
+    }.get(lang, "📄 PDF yuklab olish")
+
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text=T[lang]["btn_pdf"], callback_data="get_pdf"),
-            InlineKeyboardButton(text=T[lang]["btn_docx"], callback_data="get_docx"),
-        ],
-        [
-            InlineKeyboardButton(text=T[lang]["btn_both"], callback_data="get_both"),
+            InlineKeyboardButton(text=btn_pdf_text, callback_data="get_pdf"),
         ],
         [
             InlineKeyboardButton(text=alt_script_text, callback_data="toggle_doc_script"),
@@ -161,35 +163,35 @@ def get_welcome_card(lang: str, first_name: str = ""):
     cards = {
         "lat": (
             f"📋 <b>Assalomu alaykum{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Abivtivkabot</b> — barcha uchun (talabalar, o‘qituvchilar, shifokorlar va davlat xizmatchilari) "
-            "rasmiy <b>Obyektivka (Ma’lumotnoma)</b> tayyorlab beruvchi universal platforma.\n\n"
-            "✨ <b>Yangi imkoniyatlar:</b>\n"
+            "<b>Obyektivka PRO</b> — barcha uchun (talabalar, o‘qituvchilar, shifokorlar va davlat xizmatchilari) "
+            "rasmiy <b>Obyektivka (Ma’lumotnoma)</b> tayyorlab beruvchi platforma.\n\n"
+            "✨ <b>Imkoniyatlar:</b>\n"
             "• 🏛 <b>2 xil shablon</b> — Talaba namunasi hamda Klassik 3.5-shakl (Mehnat faoliyati bilan)\n"
             "• 🔄 <b>Lotin ↔ Kirill</b> — 1 marta yozib, xohlagan alifboda yuklab olish\n"
             "• 📸 <b>Aqlli 3x4 rasm</b> — istalgan rasmni avtomatik 3x4 formatga keltirish\n"
-            "• 📄 <b>Word va PDF</b> — 100% bepul va tayyor formatlar\n\n"
+            "• 📄 <b>Rasmiy PDF</b> — 100% bepul va chop etishga tayyor\n\n"
             "👇 <i>Quyidagi o‘zingizga qulay usulni tanlang:</i>"
         ),
         "cyr": (
             f"📋 <b>Ассалому алайкум{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Abivtivkabot</b> — барча учун (талабалар, ўқитувчилар, шифокорлар ва давлат хизматчилари) "
-            "расмий <b>Объективка (Маълумотнома)</b> тайёрлаб берувчи универсал платформа.\n\n"
-            "✨ <b>Янги имкониятлар:</b>\n"
+            "<b>Obyektivka PRO</b> — барча учун (талабалар, ўқитувчилар, шифокорлар ва давлат хизматчилари) "
+            "расмий <b>Объективка (Маълумотнома)</b> тайёрлаб берувчи платформа.\n\n"
+            "✨ <b>Имкониятлар:</b>\n"
             "• 🏛 <b>2 хил шаблон</b> — Талаба намунаси ҳамда Классик 3.5-шакл (Меҳнат фаолияти билан)\n"
             "• 🔄 <b>Лотин ↔ Кирилл</b> — 1 марта ёзиб, хоҳлаган алифбода юклаб олиш\n"
             "• 📸 <b>Ақлли 3x4 расм</b> — исталган расмни автоматик 3x4 форматга келтириш\n"
-            "• 📄 <b>Word ва PDF</b> — 100% бепул ва тайёр форматлар\n\n"
+            "• 📄 <b>Расмий PDF</b> — 100% бепул ва чоп этишга тайёр\n\n"
             "👇 <i>Қуйидаги ўзингизга қулай усулни танланг:</i>"
         ),
         "ru": (
             f"📋 <b>Здравствуйте{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Abivtivkabot</b> — универсальная платформа для бесплатного создания официальной "
+            "<b>Obyektivka PRO</b> — универсальная платформа для бесплатного создания официальной "
             "<b>Объективки (Справки)</b> для студентов, учителей и госслужащих.\n\n"
             "✨ <b>Возможности:</b>\n"
             "• 🏛 <b>2 шаблона</b> — Студенческий и Классический (госслужба / работа)\n"
             "• 🔄 <b>Латиница ↔ Кириллица</b> — автоперевод в 1 клик\n"
             "• 📸 <b>Умное фото 3x4</b> — автообрезка из галереи\n"
-            "• 📄 <b>Word и PDF</b> — 100% бесплатно\n\n"
+            "• 📄 <b>Официальный PDF</b> — 100% бесплатно\n\n"
             "👇 <i>Выберите удобный способ заполнения:</i>"
         )
     }
@@ -220,10 +222,8 @@ async def cmd_stats(message: types.Message):
         except Exception:
             pass
     await message.answer(
-        f"📊 <b>Bot statistikasi (Abivtivkabot):</b>\n\n"
-        f"📄 Jami tayyorlangan hujjatlar: <b>{stats.get('total', 0)}</b> ta\n"
-        f"• PDF formatda: <b>{stats.get('pdf', 0)}</b> ta\n"
-        f"• Word (.docx) formatda: <b>{stats.get('docx', 0)}</b> ta\n"
+        f"📊 <b>Bot statistikasi (Obyektivka PRO):</b>\n\n"
+        f"📄 Jami tayyorlangan PDF hujjatlar: <b>{stats.get('pdf', stats.get('total', 0))}</b> ta\n"
         f"• 🎓 Talaba namunasi: <b>{stats.get('student', 0)}</b> ta\n"
         f"• 🏛 Klassik (Ish/Xodim) namunasi: <b>{stats.get('classic', 0)}</b> ta"
     )
@@ -680,7 +680,7 @@ async def show_finish_menu(message: types.Message, state: FSMContext):
     await message.answer(summary, reply_markup=ReplyKeyboardRemove())
     await message.answer("👇", reply_markup=get_format_kb(lang, tpl))
 
-@dp.callback_query(F.data.in_(["get_pdf", "get_docx", "get_both", "toggle_doc_script", "toggle_doc_tpl", "restart"]))
+@dp.callback_query(F.data.in_(["get_pdf", "toggle_doc_script", "toggle_doc_tpl", "restart"]))
 async def cb_download(call: types.CallbackQuery, state: FSMContext):
     action = call.data
     data = await state.get_data()
@@ -700,34 +700,26 @@ async def cb_download(call: types.CallbackQuery, state: FSMContext):
         new_lang = "cyr" if lang == "lat" else "lat"
         await state.update_data(lang=new_lang)
         await call.message.edit_reply_markup(reply_markup=get_format_kb(new_lang, tpl))
-        await call.answer("✅ Alifbo o‘zgartirildi! Endi PDF yoki Word tugmasini bosing.")
+        await call.answer("✅ Alifbo o‘zgartirildi! Endi «PDF yuklab olish» tugmasini bosing.")
         return
 
     if action == "toggle_doc_tpl":
         new_tpl = "classic" if tpl == "student" else "student"
         await state.update_data(template_type=new_tpl)
         await call.message.edit_reply_markup(reply_markup=get_format_kb(lang, new_tpl))
-        await call.answer("✅ Shablon turi o‘zgartirildi! Endi PDF yoki Word tugmasini bosing.")
+        await call.answer("✅ Shablon turi o‘zgartirildi! Endi «PDF yuklab olish» tugmasini bosing.")
         return
         
     await call.answer(T[lang]["generating"])
     msg_wait = await call.message.answer(T[lang]["generating"])
     
-    docx_file = DOWNLOADS_DIR / f"obyektivka_{user_id}.docx"
     pdf_file = DOWNLOADS_DIR / f"obyektivka_{user_id}.pdf"
     
     try:
-        if action in ["get_docx", "get_both"]:
-            generate_docx(data, str(docx_file))
-            await call.message.answer_document(
-                FSInputFile(str(docx_file), filename=f"Obyektivka_{data.get('fio', 'doc')}.docx")
-            )
-            
-        if action in ["get_pdf", "get_both"]:
-            generate_pdf(data, str(pdf_file))
-            await call.message.answer_document(
-                FSInputFile(str(pdf_file), filename=f"Obyektivka_{data.get('fio', 'doc')}.pdf")
-            )
+        generate_pdf(data, str(pdf_file))
+        await call.message.answer_document(
+            FSInputFile(str(pdf_file), filename=f"Obyektivka_{data.get('fio', 'doc')}.pdf")
+        )
             
         await msg_wait.delete()
         await call.message.answer(T[lang]["ready"], reply_markup=get_format_kb(lang, tpl))

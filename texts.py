@@ -19,8 +19,8 @@ T = {
     "lat": {
         "welcome": (
             "Assalomu alaykum! 👋\n\n"
-            "Bu bot talabalar uchun <b>bepul</b> rasmiy obyektivka (ma'lumotnoma) tayyorlab beradi. "
-            "Savollarga javob bering — oxirida tayyor <b>PDF</b> yoki <b>Word</b> faylni olasiz.\n\n"
+            "Bu bot barcha uchun (talabalar, o‘qituvchilar, davlat xizmatchilari) <b>bepul</b> rasmiy <b>Obyektivka (Ma’lumotnoma)</b> tayyorlab beradi. "
+            "Savollarga javob bering — oxirida tayyor rasmiy <b>PDF</b> faylni olasiz.\n\n"
             "/start — qaytadan boshlash\n/cancel — bekor qilish"
         ),
         "fio": "👤 <b>Familiya, ism va otangizning ismini</b> kiriting:\n\n<i>Masalan: O‘rinov Rustamjon Akmaljon o‘g‘li</i>",
@@ -73,8 +73,8 @@ T = {
     "cyr": {
         "welcome": (
             "Ассалому алайкум! 👋\n\n"
-            "Бу бот талабалар учун <b>бепул</b> расмий объективка (маълумотнома) тайёрлаб беради. "
-            "Саволларга жавоб беринг — охирида тайёр <b>PDF</b> ёки <b>Word</b> файлни оласиз.\n\n"
+            "Бу бот барча учун (талабалар, ўқитувчилар, давлат хизматчилари) <b>бепул</b> расмий <b>Объективка (Маълумотнома)</b> тайёрлаб беради. "
+            "Саволларга жавоб беринг — охирида тайёр расмий <b>PDF</b> файлни оласиз.\n\n"
             "/start — қайтадан бошлаш\n/cancel — бекор қилиш"
         ),
         "fio": "👤 <b>Фамилия, исм ва отангизнинг исмини</b> киритинг:\n\n<i>Масалан: Ўринов Рустамжон Акмалжон ўғли</i>",
@@ -120,7 +120,7 @@ T = {
     "ru": {
         "welcome": (
             "Здравствуйте! 👋\n\n"
-            "Этот бот <b>бесплатно</b> подготовит официальную студенческую объективку (справку).\n\n"
+            "Этот бот <b>бесплатно</b> подготовит официальную <b>Объективку (Справку)</b> в формате PDF.\n\n"
             "/start — начать заново\n/cancel — отменить"
         ),
         "fio": "👤 Введите <b>Фамилию, имя и отчество</b>:\n\n<i>Например: Уринов Рустамжон Акмалжон угли</i>",
