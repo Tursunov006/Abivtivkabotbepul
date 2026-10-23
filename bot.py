@@ -75,30 +75,32 @@ dp = Dispatcher(storage=MemoryStorage())
 def get_main_menu_kb(lang: str = "lat"):
     buttons = []
     
-    # 1. Mini Web App tugmasi (Asosiy tavsiya)
+    # 1. Asosiy yagona Mini Web App tugmasi
     if WEBAPP_URL:
         btn_webapp_text = {
-            "lat": "🚀 Mini Ilovada 1 daqiqada tayyorlash",
-            "cyr": "🚀 Мини Иловада 1 дақиқада тайёрлаш",
-            "ru": "🚀 Создать за 1 минуту в Мини-Приложении"
-        }.get(lang, "🚀 Mini Ilovada tayyorlash")
+            "lat": "📋 Obyektivka tayyorlash (PDF)",
+            "cyr": "📋 Объективка тайёрлаш (PDF)",
+            "ru": "📋 Создать объективку (PDF)"
+        }.get(lang, "📋 Obyektivka tayyorlash (PDF)")
         buttons.append([InlineKeyboardButton(text=btn_webapp_text, web_app=WebAppInfo(url=WEBAPP_URL))])
 
-    # 2. Bot ichida qadamma-qadam to'ldirish
+    # 2. Qo'shimcha qulaylik: Botda to'ldirish va Til (bitta qatorda ixcham)
     btn_chat_text = {
-        "lat": "💬 Savol-javob orqali to'ldirish",
-        "cyr": "💬 Савол-жавоб орқали тўлдириш",
-        "ru": "💬 Заполнить пошагово в чате"
-    }.get(lang, "💬 Savol-javob orqali to'ldirish")
-    buttons.append([InlineKeyboardButton(text=btn_chat_text, callback_data="start_chat_flow")])
+        "lat": "💬 Botda to‘ldirish",
+        "cyr": "💬 Ботда тўлдириш",
+        "ru": "💬 В боте"
+    }.get(lang, "💬 Botda to‘ldirish")
 
-    # 3. Tilni o'zgartirish
     btn_lang_text = {
-        "lat": "🌐 Tilni o'zgartirish",
-        "cyr": "🌐 Тилни ўзгартириш",
-        "ru": "🌐 Изменить язык"
-    }.get(lang, "🌐 Tilni o'zgartirish")
-    buttons.append([InlineKeyboardButton(text=btn_lang_text, callback_data="change_lang")])
+        "lat": "🌐 Til",
+        "cyr": "🌐 Тил",
+        "ru": "🌐 Язык"
+    }.get(lang, "🌐 Til")
+
+    buttons.append([
+        InlineKeyboardButton(text=btn_chat_text, callback_data="start_chat_flow"),
+        InlineKeyboardButton(text=btn_lang_text, callback_data="change_lang")
+    ])
     
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -132,12 +134,6 @@ def get_rel_more_kb(lang: str):
     ], resize_keyboard=True, one_time_keyboard=True)
 
 def get_format_kb(lang: str, current_tpl: str = "student"):
-    alt_script_text = "🔄 Kirillda olish (Авто-ўгириш)" if lang == "lat" else "🔄 Lotinda olish (Avto-o‘girish)"
-    tpl_switch_text = (
-        "🏛 Klassik shaklga o‘tish (Ish uchun)"
-        if current_tpl == "student" else
-        "🎓 Talaba shakliga o‘tish"
-    )
     btn_pdf_text = {
         "lat": "📄 PDF yuklab olish",
         "cyr": "📄 PDF юклаб олиш",
@@ -149,50 +145,24 @@ def get_format_kb(lang: str, current_tpl: str = "student"):
             InlineKeyboardButton(text=btn_pdf_text, callback_data="get_pdf"),
         ],
         [
-            InlineKeyboardButton(text=alt_script_text, callback_data="toggle_doc_script"),
-        ],
-        [
-            InlineKeyboardButton(text=tpl_switch_text, callback_data="toggle_doc_tpl"),
-        ],
-        [
             InlineKeyboardButton(text=T[lang]["btn_restart"], callback_data="restart"),
         ]
     ])
 
 def get_welcome_card(lang: str, first_name: str = ""):
+    greeting = f", {first_name}" if first_name else ""
     cards = {
         "lat": (
-            f"📋 <b>Assalomu alaykum{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Obyektivka PRO</b> — barcha uchun (talabalar, o‘qituvchilar, shifokorlar va davlat xizmatchilari) "
-            "rasmiy <b>Obyektivka (Ma’lumotnoma)</b> tayyorlab beruvchi platforma.\n\n"
-            "✨ <b>Imkoniyatlar:</b>\n"
-            "• 🏛 <b>2 xil shablon</b> — Talaba namunasi hamda Klassik 3.5-shakl (Mehnat faoliyati bilan)\n"
-            "• 🔄 <b>Lotin ↔ Kirill</b> — 1 marta yozib, xohlagan alifboda yuklab olish\n"
-            "• 📸 <b>Aqlli 3x4 rasm</b> — istalgan rasmni avtomatik 3x4 formatga keltirish\n"
-            "• 📄 <b>Rasmiy PDF</b> — 100% bepul va chop etishga tayyor\n\n"
-            "👇 <i>Quyidagi o‘zingizga qulay usulni tanlang:</i>"
+            f"Assalomu alaykum{greeting}! 👋\n\n"
+            "Rasmiy <b>Obyektivka (Ma’lumotnoma)</b> tayyorlash uchun quyidagi tugmani bosing:"
         ),
         "cyr": (
-            f"📋 <b>Ассалому алайкум{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Obyektivka PRO</b> — барча учун (талабалар, ўқитувчилар, шифокорлар ва давлат хизматчилари) "
-            "расмий <b>Объективка (Маълумотнома)</b> тайёрлаб берувчи платформа.\n\n"
-            "✨ <b>Имкониятлар:</b>\n"
-            "• 🏛 <b>2 хил шаблон</b> — Талаба намунаси ҳамда Классик 3.5-шакл (Меҳнат фаолияти билан)\n"
-            "• 🔄 <b>Лотин ↔ Кирилл</b> — 1 марта ёзиб, хоҳлаган алифбода юклаб олиш\n"
-            "• 📸 <b>Ақлли 3x4 расм</b> — исталган расмни автоматик 3x4 форматга келтириш\n"
-            "• 📄 <b>Расмий PDF</b> — 100% бепул ва чоп этишга тайёр\n\n"
-            "👇 <i>Қуйидаги ўзингизга қулай усулни танланг:</i>"
+            f"Ассалому алайкум{greeting}! 👋\n\n"
+            "Расмий <b>Объективка (Маълумотнома)</b> тайёрлаш учун қуйидаги тугмани босинг:"
         ),
         "ru": (
-            f"📋 <b>Здравствуйте{', ' + first_name if first_name else ''}!</b>\n\n"
-            "<b>Obyektivka PRO</b> — универсальная платформа для бесплатного создания официальной "
-            "<b>Объективки (Справки)</b> для студентов, учителей и госслужащих.\n\n"
-            "✨ <b>Возможности:</b>\n"
-            "• 🏛 <b>2 шаблона</b> — Студенческий и Классический (госслужба / работа)\n"
-            "• 🔄 <b>Латиница ↔ Кириллица</b> — автоперевод в 1 клик\n"
-            "• 📸 <b>Умное фото 3x4</b> — автообрезка из галереи\n"
-            "• 📄 <b>Официальный PDF</b> — 100% бесплатно\n\n"
-            "👇 <i>Выберите удобный способ заполнения:</i>"
+            f"Здравствуйте{greeting}! 👋\n\n"
+            "Чтобы создать официальную <b>Объективку (Справку)</b> в PDF, нажмите кнопку ниже:"
         )
     }
     return cards.get(lang, cards["lat"])
@@ -674,7 +644,7 @@ async def show_finish_menu(message: types.Message, state: FSMContext):
         f"📞 {data.get('contact', '')}\n"
         f"{has_photo}\n"
         f"👨‍👩‍👧 Oila a'zolari: {n_rel} ta\n\n"
-        f"{T[lang]['choose_format']}"
+        "Tayyor <b>PDF</b> faylni yuklab olish uchun pastdagi tugmani bosing:"
     )
     
     await message.answer(summary, reply_markup=ReplyKeyboardRemove())
