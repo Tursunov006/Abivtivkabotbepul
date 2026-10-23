@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 from aiogram import Bot
 from aiogram.types import FSInputFile
@@ -22,10 +23,11 @@ from ai_enhancer import enhance_text_with_ai
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
 
-app = FastAPI(title="Universal Obyektivka Web App API")
+app = FastAPI(title="Obyektivka PRO Web App API")
 
 BASE_DIR = Path(__file__).parent
 STATIC_DIR = BASE_DIR / "static"
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 TEMP_DIR = BASE_DIR / "temp_files"
 TEMP_DIR.mkdir(exist_ok=True)
 STATS_FILE = TEMP_DIR / "stats.json"
