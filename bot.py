@@ -28,10 +28,66 @@ from ai_enhancer import enhance_text_with_ai
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
 WEBAPP_URL = os.getenv("WEBAPP_URL", "https://abivtivkabotbepul.onrender.com").strip()
+REQUIRED_CHANNEL = os.getenv("REQUIRED_CHANNEL", "").strip()
+CHANNEL_URL = os.getenv("CHANNEL_URL", "").strip()
 
 BASE_DIR = Path(__file__).parent
 DOWNLOADS_DIR = BASE_DIR / "temp_files"
 DOWNLOADS_DIR.mkdir(exist_ok=True)
+
+
+async def is_subscribed(bot: Bot, user_id: int) -> bool:
+    """Foydalanuvchi belgilangan kanalga a'zo bo'lganligini tekshiradi."""
+    if not REQUIRED_CHANNEL:
+        return True
+    try:
+        member = await bot.get_chat_member(chat_id=REQUIRED_CHANNEL, user_id=user_id)
+        return member.status in ["creator", "administrator", "member", "restricted"]
+    except Exception as e:
+        logging.warning(f"Kanal obunasini tekshirishda ogohlantirish: {e}")
+        return True
+
+
+def get_sub_kb(lang: str = "lat"):
+    url = CHANNEL_URL or (
+        f"https://t.me/{REQUIRED_CHANNEL.lstrip('@')}"
+        if REQUIRED_CHANNEL.startswith("@")
+        else "https://t.me"
+    )
+    btn_sub = {
+        "lat": "📢 Kanalga a’zo bo‘lish",
+        "cyr": "📢 Каналга аъзо бўлиш",
+        "ru": "📢 Подписаться на канал"
+    }.get(lang, "📢 Kanalga a’zo bo‘lish")
+
+    btn_check = {
+        "lat": "✅ A’zo bo‘ldim (Tekshirish)",
+        "cyr": "✅ Аъзо бўлдим (Текшириш)",
+        "ru": "✅ Я подписался (Проверить)"
+    }.get(lang, "✅ A’zo bo‘ldim (Tekshirish)")
+
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=btn_sub, url=url)],
+        [InlineKeyboardButton(text=btn_check, callback_data="check_sub")]
+    ])
+
+
+def get_sub_card(lang: str = "lat"):
+    cards = {
+        "lat": (
+            "⚠️ <b>Botdan to‘liq foydalanish uchun rasmiy kanalimizga a’zo bo‘ling!</b>\n\n"
+            "Kanalga a’zo bo‘lgach, pastdagi <b>«✅ A’zo bo‘ldim (Tekshirish)»</b> tugmasini bosing:"
+        ),
+        "cyr": (
+            "⚠️ <b>Ботдан тўлиқ фойдаланиш учун расмий каналимизга аъзо бўлинг!</b>\n\n"
+            "Каналга аъзо бўлгач, пастдаги <b>«✅ Аъзо бўлдим (Текшириш)»</b> тугмасини босинг:"
+        ),
+        "ru": (
+            "⚠️ <b>Для использования бота подпишитесь на наш официальный канал!</b>\n\n"
+            "После подписки нажмите кнопку <b>«✅ Я подписался (Проверить)»</b>:"
+        )
+    }
+    return cards.get(lang, cards["lat"])
 
 
 def cleanup_temp_files(max_age_seconds: int = 1800):
@@ -175,11 +231,41 @@ async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
     await state.update_data(lang=lang, template_type="student", relatives=[])
     
+    # 1 ta majburiy kanalga a'zolikni tekshirish
+    if REQUIRED_CHANNEL and not await is_subscribed(message.bot, message.from_user.id):
+        await message.answer(
+            get_sub_card(lang),
+            reply_markup=get_sub_kb(lang)
+        )
+        return
+
     first_name = message.from_user.first_name or ""
     await message.answer(
         get_welcome_card(lang, first_name),
         reply_markup=get_main_menu_kb(lang)
     )
+
+@dp.callback_query(F.data == "check_sub")
+async def cb_check_sub(call: types.CallbackQuery, state: FSMContext, bot: Bot):
+    data = await state.get_data()
+    lang = data.get("lang", "lat")
+    subbed = await is_subscribed(bot, call.from_user.id)
+    if subbed:
+        await call.answer(
+            "✅ Obuna tasdiqlandi!" if lang == "lat" else ("✅ Обуна тасдиқланди!" if lang == "cyr" else "✅ Подписка подтверждена!")
+        )
+        first_name = call.from_user.first_name or ""
+        await call.message.edit_text(
+            get_welcome_card(lang, first_name),
+            reply_markup=get_main_menu_kb(lang)
+        )
+    else:
+        err_text = {
+            "lat": "❌ Siz hali kanalga a’zo bo‘lmadingiz! Iltimos, oldin kanalga a’zo bo‘ling.",
+            "cyr": "❌ Сиз ҳали каналга аъзо бўлмадингиз! Илтимос, олдин каналга аъзо бўлинг.",
+            "ru": "❌ Вы ещё не подписались на канал! Пожалуйста, сначала подпишитесь."
+        }.get(lang, "❌ Siz hali kanalga a’zo bo‘lmadingiz! Iltimos, oldin kanalga a’zo bo‘ling.")
+        await call.answer(err_text, show_alert=True)
 
 @dp.message(Command("stats"))
 async def cmd_stats(message: types.Message):
@@ -195,7 +281,44 @@ async def cmd_stats(message: types.Message):
         f"📊 <b>Bot statistikasi (Obyektivka PRO):</b>\n\n"
         f"📄 Jami tayyorlangan PDF hujjatlar: <b>{stats.get('pdf', stats.get('total', 0))}</b> ta\n"
         f"• 🎓 Talaba namunasi: <b>{stats.get('student', 0)}</b> ta\n"
-        f"• 🏛 Klassik (Ish/Xodim) namunasi: <b>{stats.get('classic', 0)}</b> ta"
+        f"• 🏛 Klassik (Ish/Xodim) namunasi: <b>{stats.get('classic', 0)}</b> ta\n\n"
+        f"📢 Majburiy kanal: <b>{REQUIRED_CHANNEL or 'o‘chirilgan'}</b>"
+    )
+
+@dp.message(Command("setchannel"))
+async def cmd_set_channel(message: types.Message):
+    """Admin uchun: bitta majburiy kanalni o'rnatish yoki o'chirish."""
+    global REQUIRED_CHANNEL, CHANNEL_URL
+    parts = message.text.strip().split()
+    if len(parts) < 2:
+        cur = REQUIRED_CHANNEL if REQUIRED_CHANNEL else "Belgilanmagan (o‘chirilgan)"
+        await message.answer(
+            f"📢 <b>Majburiy obuna rejimi:</b>\n"
+            f"Hozirgi kanal: <b>{cur}</b>\n\n"
+            "Kanal o‘rnatish uchun:\n"
+            "👉 <code>/setchannel @kanalingiz</code>\n\n"
+            "O‘chirib qo‘yish uchun:\n"
+            "👉 <code>/setchannel off</code>\n\n"
+            "<i>Eslatma: Bot ushbu kanalda administrator bo‘lishi kerak!</i>"
+        )
+        return
+
+    ch = parts[1].strip()
+    if ch.lower() in ["off", "yoq", "none", "0"]:
+        REQUIRED_CHANNEL = ""
+        CHANNEL_URL = ""
+        await message.answer("✅ Majburiy obuna rejimi muvaffaqiyatli o‘chirildi.")
+        return
+
+    if not ch.startswith("@") and not ch.startswith("-100"):
+        ch = "@" + ch
+
+    REQUIRED_CHANNEL = ch
+    CHANNEL_URL = f"https://t.me/{ch.lstrip('@')}" if ch.startswith("@") else "https://t.me"
+    await message.answer(
+        f"✅ <b>Majburiy kanal o‘rnatildi:</b> {ch}\n\n"
+        f"Endi foydalanuvchilar botdan foydalanishdan oldin <b>{ch}</b> kanaliga a’zo bo‘lishlari shart bo‘ladi.\n"
+        f"<i>Iltimos, botni kanalingizga qo‘shib, unga 'Administrator' huquqini berishni unutmang!</i>"
     )
 
 @dp.message(Command("lang"))
@@ -231,9 +354,16 @@ async def cb_set_lang(call: types.CallbackQuery, state: FSMContext):
 
 # Bot ichida savol-javob orqali davom etish — oldin shablon turini so'raymiz
 @dp.callback_query(F.data == "start_chat_flow")
-async def cb_start_chat(call: types.CallbackQuery, state: FSMContext):
+async def cb_start_chat(call: types.CallbackQuery, state: FSMContext, bot: Bot):
     data = await state.get_data()
     lang = data.get("lang", "lat")
+    
+    # Kanal a'zoligini tekshirish
+    if REQUIRED_CHANNEL and not await is_subscribed(bot, call.from_user.id):
+        await call.answer("⚠️ Iltimos, oldin kanalga a’zo bo‘ling!", show_alert=True)
+        await call.message.edit_text(get_sub_card(lang), reply_markup=get_sub_kb(lang))
+        return
+
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎓 Talabalar uchun (OTM / Yutuqlar)", callback_data="chat_tpl_student")],
         [InlineKeyboardButton(text="🏛 Barcha / Ish uchun (Klassik 3.5-shakl)", callback_data="chat_tpl_classic")],

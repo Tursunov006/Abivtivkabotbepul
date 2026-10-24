@@ -22,6 +22,7 @@ from ai_enhancer import enhance_text_with_ai
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
+REQUIRED_CHANNEL = os.getenv("REQUIRED_CHANNEL", "").strip()
 
 app = FastAPI(title="Obyektivka PRO Web App API")
 
@@ -142,6 +143,22 @@ async def api_ai_enhance(req: EnhanceRequest):
 
 @app.post("/api/generate")
 async def generate_document(req: GenerateRequest, background_tasks: BackgroundTasks):
+    # Majburiy kanal tekshiruvi (agar sozlangan bo'lsa)
+    if REQUIRED_CHANNEL and req.user_id and BOT_TOKEN:
+        try:
+            check_bot = Bot(token=BOT_TOKEN)
+            member = await check_bot.get_chat_member(chat_id=REQUIRED_CHANNEL, user_id=req.user_id)
+            await check_bot.session.close()
+            if member.status not in ["creator", "administrator", "member", "restricted"]:
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Iltimos, avval rasmiy kanalimizga a’zo bo‘ling: {REQUIRED_CHANNEL}"
+                )
+        except HTTPException:
+            raise
+        except Exception as err:
+            print(f"Kanal obunasini tekshirishda ogohlantirish: {err}")
+
     # Fon vazifasida eski fayllarni tozalash
     background_tasks.add_task(cleanup_old_temp_files)
     req_id = str(uuid.uuid4())[:8]
