@@ -28,8 +28,8 @@ from ai_enhancer import enhance_text_with_ai
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
 WEBAPP_URL = os.getenv("WEBAPP_URL", "https://abivtivkabotbepul.onrender.com").strip()
-REQUIRED_CHANNEL = os.getenv("REQUIRED_CHANNEL", "").strip()
-CHANNEL_URL = os.getenv("CHANNEL_URL", "").strip()
+REQUIRED_CHANNEL = os.getenv("REQUIRED_CHANNEL", "@code76s").strip()
+CHANNEL_URL = os.getenv("CHANNEL_URL", "https://t.me/code76s").strip()
 
 BASE_DIR = Path(__file__).parent
 DOWNLOADS_DIR = BASE_DIR / "temp_files"

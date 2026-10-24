@@ -22,7 +22,7 @@ from ai_enhancer import enhance_text_with_ai
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
-REQUIRED_CHANNEL = os.getenv("REQUIRED_CHANNEL", "").strip()
+REQUIRED_CHANNEL = os.getenv("REQUIRED_CHANNEL", "@code76s").strip()
 
 app = FastAPI(title="Obyektivka PRO Web App API")
 
